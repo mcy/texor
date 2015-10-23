@@ -1,0 +1,77 @@
+% % %
+% Operators
+% % %
+
+%% Imports %%
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\include{variables}
+
+%% Linear Alg %%
+\DeclareMathOperator{\img}{im}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\sign}{sign}
+\newcommand{\transp}[1]{#1^{\mathrm{T}}}
+\DeclareMathOperator{\tr}{tr}
+
+\newcommand{\powset}[1]{\CP\left(#1\right)} 
+
+%% Categories %%
+\DeclareMathOperator{\Hom}{Hom} % hom-set
+\DeclareMathOperator{\Endo}{End} % endomorphism
+\DeclareMathOperator{\Aut}{Aut} % automorphism
+\DeclareMathOperator{\Obj}{Obj} % category objects
+\DeclareMathOperator{\Mor}{Mor} % category morphisms
+  
+%% Topology %%
+\DeclareMathOperator{\Int}{Int} % interior
+\DeclareMathOperator{\Ext}{Ext} % exteriror
+\DeclareMathOperator{\Bd}{Bd} % boundary
+ 
+%% Analysis %% 
+ 
+% this defines what dx actually looks like %
+\newcommand{\diff}{\mathrm{\mathstrut d}}
+ 
+% low-level tex for dx, via ISO-31 %
+\makeatletter
+\providecommand*{\rawdiff}{\@ifnextchar^{\DIfF}{\DIfF^{}}}
+\def\DIfF^#1{\mathop{\diff}\nolimits^{#1}\gobblespace}
+\def\gobblespace{\futurelet\diffarg\opspace}
+\def\opspace{\let\DiffSpace\!\ifx\diffarg(\let\DiffSpace\relax\else\ifx\diffarg[\let\DiffSpace\relax\else\ifx\diffarg\{\let\DiffSpace\relax\fi\fi\fi\DiffSpace}
+% %
+ 
+\newcommand{\D}{\rawdiff}
+% leibinz notation: 2^1 3/2 4^1
+% \leib[2]{d}{f}{x} -> (d^2 f)/dx^2
+\providecommand*{\leib}[4][]{\frac{#2^{#1}#3}{#2 #4^{#1}}} 
+\newcommand{\od}[3][]{\leib[#1]{\D}{#2}{#3}}
+\newcommand{\pd}[3][]{\leib[#1]{\partial}{#2}{#3}}
+ 
+%% Vect Calc %%
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\diverge}{div}
+\DeclareMathOperator{\curl}{curl}
+\newcommand{\Grad}{\nabla}
+\newcommand{\Diverge}{\nabla\cdot}
+\newcommand{\Curl}{\nabla\times}
+\newcommand{\laplace}{\nabla^2}
+
+%% Logic %%
+\newcommand{\AND}{\,\mathrm{and}\,}
+\newcommand{\OR}{\,\mathrm{or}\,}
+\newcommand{\XOR}{\,\mathrm{xor}\,}
+ 
+%% Misc %%
+\DeclareMathOperator{\ide}{id}
+
+\DeclareMathOperator{\lcd}{lcd} 
+ 
+\newcommand{\nin}{\notin}
+\newcommand{\ind}{\mathbf{1}}
+\newcommand{\isom}{\simeq}
+\renewcommand{\cong}{\equiv}
+\newcommand{\isdef}{:=}
+ 
+\newcommand{\jacobi}[2]{\left(\frac{#1}{#2}\right)}

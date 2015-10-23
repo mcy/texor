@@ -1,0 +1,40 @@
+% % %
+% Problem Set Formatting
+% % %
+
+\usepackage{ifthen}
+
+\newcommand{\psetSubject}[1]{\def\psetsubject{#1}}
+\def\psetsubject{??.???}
+
+\newcommand{\psetAuthor}[1]{\def\psetauthor{#1}}
+\def\psetauthor{Miguel Young}
+
+\newcommand{\psetNum}[1]{\def\psetnum{#1}}
+\def\psetnum{?}
+
+\newcommand{\psetCollabs}[1]{\def\psetcollabs{#1}}
+\def\psetcollabs{}
+
+\newcommand{\psetSources}[1]{\def\psetsources{#1}}
+\def\psetsources{}
+
+\newcommand{\mkPsetTitle}[1]{%
+    \newpage
+    \begin{center}
+        {\huge \psetsubject{} Pset \psetnum{} #1 }
+
+        {\large \psetauthor{} }
+
+        \ifthenelse{\equal{\psetcollabs}{}}{}{Collaborators: \psetcollabs}
+        
+        \ifthenelse{\equal{\psetsources}{}}{}{Sources: \psetsources}
+    \end{center}
+}
+
+\newcounter{psetProblemCounter}
+\setcounter{psetProblemCounter}{0}
+\newenvironment{psetProblem}{%
+    \stepcounter{psetProblemCounter}
+    \mkPsetTitle{Problem \arabic{psetProblemCounter}}
+}{}

@@ -1,0 +1,40 @@
+% % %
+% Theorem Enviroments
+%
+% each environment comes in one of three forms:
+%   Sthm: Section numbered
+%   thm: numbered
+%   thm*: unnumbered
+% % %
+
+%% Imports %%
+\usepackage{amsthm}
+
+% shorthand for theorem generation
+\newcommand{\mkthm}[2]{%
+    \newtheorem{S#1}{#2}[section]
+    \newtheorem{#1}{#2}
+    \newtheorem*{#1*}{#2}
+}
+
+\mkthm{thm}{Theorem}
+\mkthm{lem}{Lemma}
+\mkthm{prp}{Proposition}
+\mkthm{cor}{Corollary}
+
+\theoremstyle{definition}
+
+\mkthm{defn}{Definition}
+\mkthm{axi}{Axiom}
+\mkthm{conj}{Conjecture}
+\mkthm{expl}{Example}
+\mkthm{exer}{Exercise}
+
+\theoremstyle{remark}
+
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+\newenvironment{sol}
+  {\begin{proof}[Solution]}
+  {\end{proof}}
