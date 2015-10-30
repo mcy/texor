@@ -9,6 +9,7 @@
 
 %% Imports %%
 \usepackage{amsthm}
+\usepackage{wasysym}
 
 % shorthand for theorem generation
 \newcommand{\mkthm}[2]{%
@@ -19,7 +20,7 @@
 
 \mkthm{thm}{Theorem}
 \mkthm{lem}{Lemma}
-\mkthm{prp}{Proposition}
+\mkthm{prop}{Proposition}
 \mkthm{cor}{Corollary}
 
 \theoremstyle{definition}
@@ -27,14 +28,17 @@
 \mkthm{defn}{Definition}
 \mkthm{axi}{Axiom}
 \mkthm{conj}{Conjecture}
-\mkthm{expl}{Example}
-\mkthm{exer}{Exercise}
+\mkthm{example}{Example}
+\mkthm{exercise}{Exercise}
+\mkthm{fact}{Fact}
 
 \theoremstyle{remark}
 
-\newtheorem*{rem}{Remark}
-\newtheorem*{note}{Note}
+\mkthm{rem}{Remark}
+\mkthm{note}{Note}
 
-\newenvironment{sol}
+\newenvironment{solution}
   {\begin{proof}[Solution]}
   {\end{proof}}
+  
+\newcommand{\useHappyQED}{\renewcommand{\qedsymbol}{\smiley{}}}

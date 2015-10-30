@@ -19,12 +19,12 @@
 \newcommand{\psetSources}[1]{\def\psetsources{#1}}
 \def\psetsources{}
 
-\newcommand{\mkPsetTitle}[1]{%
+\newcommand{\psetTitle}[1]{%
     \newpage
     \begin{center}
         {\huge \psetsubject{} Pset \psetnum{} #1 }
 
-        {\large \psetauthor{} }
+        {\large \psetauthor}
 
         \ifthenelse{\equal{\psetcollabs}{}}{}{Collaborators: \psetcollabs}
         
@@ -32,9 +32,11 @@
     \end{center}
 }
 
+\newcommand{\mkPsetTitle}{\psetTitle{}}
+
 \newcounter{psetProblemCounter}
 \setcounter{psetProblemCounter}{0}
 \newenvironment{psetProblem}{%
     \stepcounter{psetProblemCounter}
-    \mkPsetTitle{Problem \arabic{psetProblemCounter}}
+    \psetTitle{Problem \arabic{psetProblemCounter}}
 }{}

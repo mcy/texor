@@ -10,6 +10,7 @@
 
 %% Linear Alg %%
 \DeclareMathOperator{\img}{im}
+\newcommand{\image}{\message{\\image is deprecated, use \\img instead}\img} %% deprecated
 \DeclareMathOperator{\Span}{span}
 \DeclareMathOperator{\sign}{sign}
 \newcommand{\transp}[1]{#1^{\mathrm{T}}}
@@ -64,14 +65,19 @@
 \newcommand{\XOR}{\,\mathrm{xor}\,}
  
 %% Misc %%
+\renewcommand{\to}{\rightarrow}
+\newcommand{\nto}{\not\to}
 \DeclareMathOperator{\ide}{id}
 
 \DeclareMathOperator{\lcd}{lcd} 
+\renewcommand{\mod}[1]{\left(\mathrm{mod}\,#1\right)}
  
 \newcommand{\nin}{\notin}
 \newcommand{\ind}{\mathbf{1}}
 \newcommand{\isom}{\simeq}
 \renewcommand{\cong}{\equiv}
 \newcommand{\isdef}{:=}
+
+\newcommand{\ov}{\overline}
  
 \newcommand{\jacobi}[2]{\left(\frac{#1}{#2}\right)}
