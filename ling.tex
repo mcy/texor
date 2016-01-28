@@ -5,15 +5,26 @@
 %% Imports %%
 \usepackage{tipa}
 \usepackage{qtree}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
 
 %% IPA %%
 \newcommand{\tp}{\textipa}
 
 \newcommand{\snd}[1]{\textipa{[#1]}}
 \newcommand{\phn}[1]{\textipa{/#1/}}
+\newcommand{\grh}[1]{$\langle$#1$\rangle$}
+\newcommand{\grht}[1]{\textipa{\grh{#1}}}
+
+\newcommand{\gn}{\textltailn}
 
 %% Phonology %%
 \newcommand{\plus}{$+$}
 \newcommand{\minus}{$-$}
 \newcommand{\into}{$\to$ }
 \newcommand{\blank}{$\underline{\quad}$ }
+\newcommand{\zero}{$\varnothing$ }
+
+%% %%
+\newcommand{\uset}[2]{$\underset{\mathrm{#2}}{\mbox{#1}}$}

@@ -3,7 +3,9 @@
 \input{pset}
 \input{ling}
 \input{math}
-\input{misc}
+
+\useHappyQED
+%\useharpoon
 
 \begin{document}
 
@@ -11,28 +13,108 @@
 \psetSources{None}
 \mkPsetTitle{}
 
-\useHappyQED
+\newcommand{\alphabet}{Aa\,Bb\,Cc\,Dd\,Ee\,Ff\,Gg\,Hh\,Ii\,Jj\,Kk\,Ll\,Mm\,Nn\,Oo\,Pp\,Qq\,Rr\,Ss\,Tt\,Uu\,Vv\,Ww\,Xx\,Yy\,Zz}
+\newcommand{\numbers}{1\,2\,3\,4\,5\,6\,7\,8\,9\,0}
 
 \begin{itemize}
-    \item Vect: $\vv$ $\vk$ $\vzero$ $\veca1$
-    \item Lie: $\Lg$ $\Ls\Lu(3)\Par{3}$
-    \item Cal: $\CC$ $\CD$ $\CP$
-    \item Fld: $\fA$ $\fF$ $\fK$
+    \item Vect: $\vv$ $\vk$ $\vzero$ $\veca1$ $\vV\ve\vc\vt\vo\vr$
+    \item Lie: $\Lg$ $\Ls\Lu\Par{3}$ $\LL\Li\Le$
+    \item Cal: $\CC$ $\CD$ $\CP$ $\CC\CA\CT\CE\CG\CO\CR\CY$
+    \item Fld: $\fA$ $\fF$ $\fK$ $\fF\fI\fE\fL\fD$
     \item Num: $\N$ $\Z$ $\Q$ $\R$ $\C$
-    \item Grk: $\al$ $\ga$ $\Ga$ $\Om$ $\la$
+    \item Grk: $\al$ $\ga$ $\Ga$ $\Om$ $\la$ $\ze$ $\ga\rho\ep\ep\ka$
     \item Cat: $\cSet$ $\cTop$ $\cGrp$ $\cCat$
-    \item Delimiters:
-    \begin{itemize}
-        \newcommand{\tallthing}{\begin{bmatrix}1\\2\end{bmatrix}}
-        \item $\Par{par}$ $\Par{\tallthing}$
-        \item $\Squ{squ}$ $\Squ{\tallthing}$
-        \item $\Cur{cur}$ $\Cur{\tallthing}$
-        \item $\Abs{abs}$ $\Abs{\tallthing}$ 
-        \item $\Nor{nor}$ $\Nor{\tallthing}$
-        \item $\Ang{ang}$ $\Ang{\tallthing}$
-        \item $\mkset{f}{\ph}$
-    \end{itemize}
 \end{itemize}
+
+\newcommand{\deltest}[1]{%
+#1 
+& $\call{#1}{x}$ 
+& $\call{#1}{x^y}$
+& $x_{\call{#1}{y}}^{z^{\call{#1}{w}}}$
+& $\displaystyle{\call{#1}{\sum_{\call{#1}{x}} \Cx}}$ 
+& $\displaystyle{\call{#1}{\prod}}$
+& $\call{#1}{\begin{array}{c}x\\y\end{array}}$ \\[6ex]
+}
+
+Delimiters:
+\begin{center}
+\begin{tabular}{r|cccccc}
+    \deltest{Par} 
+    \deltest{Squ}
+    \deltest{Sqqu}
+    \deltest{Cur}
+    \deltest{Abs}
+    \deltest{Nor}
+\end{tabular}
+\begin{tabular}{r|cccccc}
+    \deltest{Ang}
+    \deltest{SPar}
+    \deltest{PSqu}
+    \deltest{Ceil}
+    \deltest{Flo}
+    \deltest{Bra}
+    \deltest{Ket}
+\end{tabular}
+\end{center}
+
+\begin{comment}
+    \begin{itemize}
+        \newcommand{\tallthing}{\begin{array}{c}1\\2\end{array}}
+        \newcommand{\deltest}[1]{\call{#1}{#1}\,\call{#1}{\tallthing}}
+        \item $\deltest{Par}$
+        \item $\deltest{Paar}$
+        \item $\deltest{Squ}$
+        \item $\deltest{Sqqu}$
+        \item $\deltest{PSqu}$
+        \item $\deltest{SPar}$
+        \item $\deltest{Cur}$
+        \item $\deltest{Cuur}$
+        \item $\deltest{Abs}$
+        \item $\deltest{Nor}$
+        \item $\deltest{Ceil}$
+        \item $\deltest{Flo}$
+        \item $\deltest{Ang}$
+        \item $\deltest{Bra}$
+        \item $\deltest{Ket}$
+        \item $\mkset{f}{\ph}$
+        \item $\BraKet{\CH}{\Psi}$
+    \end{itemize}
+\end{comment}
+
+%\[ \Cuur{x} \quad \Cuur{\coprod} \quad \Cuur{\coprod_\Cuur{x}} \]
+%\[ \Cur{x} \quad \Cur{\coprod} \quad \Cur{\coprod_\Cur{x}} \]
+
+\[ \mathbb{123456789} \]
+\[ \mathbb{mathbb\,field} \]
+\[ \R \OR \Q \]
+
+\begin{thm}
+    Let $\overset{*}{\vii}=\ii\vi$. Then,
+    \[\ov{\vii} = \hat{\vjj}\]    
+\end{thm}
+
+\[ \StrGobbleLeft{foo}{1} \]
+
+\[ \hat\vii \vjj \]
+
+\[ A \srj B \inj C \]
+
+\[ \fld{\alphabet} \]
+\[ \fld{\numbers} \]
+\[ \cat{\alphabet} \]
+%\[ \cat{\numbers} \]
+\[ \lie{\alphabet} \]
+\[ \lie{\numbers} \]
+\[ \vect{\alphabet} \]
+\[ \vect{\numbers} \]
+
+\begin{eqnarray*}
+    f &\in& \cnt^\om \\
+    g &\in& \cnt^\infty \\
+    h &\in& \cnt^0 \\
+    p &\in& \rie \\ 
+    q &\in& \lbe
+\end{eqnarray*}
 
 \begin{center}
     \tp{a} \into \tp{\ae} / \blank p
@@ -59,6 +141,35 @@
     This is an open problem.
 \end{solution}
 
+\usevec
+
+%\renewcommand{\vec}[1]{\overset{\rightharpoonup}{#1}}
+\begin{eqnarray*}
+    \Dive\vE &=& \frac{\rho}{\ep_0} \\
+    \Dive\vB &=& 0 \\
+    \Curl\vE &=& -\pd{\vB}{t} \\
+    \Curl\vB &=& \mu_0\Par{\vJ + \ep_0\pd{\vE}{t}}
+\end{eqnarray*}
+
+\useveca
+
+\begin{eqnarray*}
+    \varoiint_{\del\Om} \vE\cdot\D\vA &=& \frac{1}{\ep_0} \iiint_\Om \rho\D V \\
+    \varoiint_{\del\Om} \vB\cdot\D\vA &=& 0 \\
+    \oint_{\del\Si} \vE\cdot\D \vs &=& -\od{}{t}\iint_\Si \vB\cdot\D\vA \\
+    \oint_{\del\Si} \vB\cdot\D \vs &=& 
+        \mu_0\iint_\Si\vJ\cdot\D\vA + \mu_0\ep_0\od{}{t}\iint_\Si\vE\cdot\D\vA 
+\end{eqnarray*}
+
+\[ \vu\,\vv\,\vw\,\vk\,\vzero \]
+
+\[ \iiiint x \D x\]
+
+\begin{thm*} {\em (Stokes.)}
+    For a differential form $\om$ and a region $R$, 
+    \[ \int_{\del R}\om = \int_R \D \om \]
+\end{thm*}
+
 \psetSubject{18.701}
 \psetNum{2}
 
@@ -66,6 +177,10 @@
     Do the thing.
     \begin{proof}
         Yes, I will.
+        \[ 
+            \bthree{\La}{\Lb}{\Lc}{\Ld}{\Le}{\Lf}{\Lg}{\Lh}{\Li}
+            \pthree{\CA}{\CB}{\CC}{\CD}{\CE}{\CF}{\CG}{\CH}{\CI} 
+        \]
     \end{proof}
 \end{psetProblem}
 

@@ -3,3 +3,10 @@
 % % %
 
 \newcommand{\smallmargins}{\geometry{lmargin=1in,rmargin=1in}}
+
+\newcommand{\resetmargins}{\geometry{lmargin=2in,rmargin=2in}}
+
+\newcommand{\call}[1]{\csname#1\endcsname}
+
+\def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
+\let\endchangemargin=\endlist

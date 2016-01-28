@@ -5,31 +5,120 @@
 %% Imports %%
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage[only,llbracket,rrbracket]{stmaryrd}
+\usepackage{scalerel}
+\usepackage{accsupp}
+\usepackage{verbatim}
 
-% Parentesis ()
-\newcommand{\Par}[1]{\left(#1\right)}
+\usepackage{xcolor}
 
-% Square Brackets []
-\newcommand{\Squ}[1]{\left[#1\right]}
+\newcommand{\phleft}[1][.]{%
+  \begingroup\colorlet{savedleftcolor}{.}%
+  \color{white}\left#1\color{savedleftcolor}%
+}
+\newcommand{\phright}[1][.]{%
+  \color{white}\right#1\endgroup
+}
 
-% Half Open Brackets [) (]
+% \newdelim[scalelimit]{commandname}{left}{right}
+\newcommand{\newdelim}[3]{%
+    \expandafter\newcommand\csname#1\endcsname[1]{%
+        \left#2##1\right#3
+    }
+}
+ 
+\begin{comment}       
+\newcommand{\newdelimiter}[4]{
+    \def\delimitercommandname{#2}
+    \expandafter\def\csname ll#2\endcsname{#3}
+    \expandafter\def\csname rr#2\endcsname{#4}
+    
+    \expandafter\newsavebox\csname lX#2\endcsname
+    \expandafter\savebox\csname lX#2\expandafter\endcsname{%
+        $\csname ll#2\endcsname$}
+    
+    \expandafter\newsavebox\csname rX#2\endcsname
+    \expandafter\savebox\csname rX#2\expandafter\endcsname{%
+        $\csname rr#2\endcsname$}
+    
+    \expandafter\def\csname lx#2\endcsname{%
+        \scalerel*{%
+            \expandafter\usebox\csname lX#2\expandafter\endcsname}{%
+                \csname ll#2\endcsname}}
+                
+    \expandafter\def\csname rx#2\endcsname{%
+        \scalerel*{%
+            \expandafter\usebox\csname rX#2\expandafter\endcsname}{%
+            \csname rr#2\endcsname}}
+    
+    \expandafter\newcommand\csname#2\endcsname[1]{{%
+        \expandafter\scaleleftright[#1]{%
+            \csname lx#2\endcsname}%
+        {\vphantom{\left[##1\right]}\expandafter##1}{%
+            \csname rx#2\endcsname}}
+    } 
+}
+\end{comment}
+
+% Parentesis (.) ((.))
+%\newdelimiter{1.75ex}{Par}{(}{)}
+\newdelim{Par}{(}{)}
+
+\def\llpar{(\hspace{-2.3pt}\hstretch{1.1}{|}}
+\def\rrpar{\hstretch{1.1}{|}\hspace{-2.3pt})}
+%\newdelimiter{2ex}{Paar}{\llpar}{\rrpar}
+
+% Square Brackets [.] [[.]]
+%\newdelimeter{1.5ex}{Squ}{[}{]}
+\newdelim{Squ}{[}{]}
+\newdelim{Sqqu}{\llbracket}{\rrbracket}
+
+%\newdelimiter{1.5ex}{Sqqu}{[\![}{]\!]}
+
+\newcommand{\LieSeparator}{,}
+\newcommand{\Lie}[2]{\Squ{#1 \LieSeparator #2}}
+
+% Half Open Brackets [.) (.]
 \newcommand{\PSqu}[1]{\left(#1\right]}
 \newcommand{\SPar}[1]{\left[#1\right)}
 
-% Curly Brackets {}
-\newcommand{\Cur}[1]{\left\{#1\right\}}
+% Curly Brackets {.}
+\newdelim{Cur}{\{}{\}}
 
-% Bars (Absolute Val) ||
+\def\llbrace{\{\hspace{-2.6pt}\hstretch{1.15}{|}}
+\def\rrbrace{\hstretch{1.15}{|}\hspace{-2.6pt}\}}
+%\newdelimiter{2ex}{Cuur}{\llbrace}{\rrbrace}
+
+% Bars (Absolute Val) |.|
 \newcommand{\Abs}[1]{\left|#1\right|}
 
-% Double Bars (Norm) || ||
+% Double Bars (Norm) ||.||
 \newcommand{\Nor}[1]{\left\Vert#1\right\Vert}
 
-% Angle Brackets <>
+% Ceiling and Floor
+\newcommand{\Ceil}[1]{\left\lceil#1\right\rceil}
+\newcommand{\Flo}[1]{\left\lfloor#1\right\rfloor}
+
+% Angle Brackets <.>
 \newcommand{\Ang}[1]{\left\langle#1\right\rangle}
 
 % Restriction f|_1
-\newcommand{\restrictto}[1]{\left.#1\right|}
+\newcommand{\restr}[1]{\left.#1\right|}
 
-% Comprehension { | }
+% Comprehension {.|.}
 \newcommand{\mkset}[2]{\left\{#1\,\middle|\,#2\right\}}
+
+% Bra <.|
+\newcommand{\Bra}[1]{\left\langle#1\right|}
+
+% Ket |.>
+\newcommand{\Ket}[1]{\left|#1\right\rangle}
+
+% Bra-Ket <.|.>
+\newcommand{\BraKet}[2]{\left\langle#1\,\middle|\,#2\right\rangle}
+
+%% Derivatives of the above %%
+\newcommand{\angprod}{\Ang{\cdot\,,\cdot}}
+\newcommand{\lieprod}{\Squ{\cdot\,,\cdot}}
+\newcommand{\absprod}{\Abs{\cdot}}
+\newcommand{\norprod}{\Nor{\cdot}}

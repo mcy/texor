@@ -9,7 +9,7 @@
 
 %% Imports %%
 \usepackage{amsthm}
-\usepackage{wasysym}
+%\usepackage{wasysym}
 
 % shorthand for theorem generation
 \newcommand{\mkthm}[2]{%
@@ -36,9 +36,17 @@
 
 \mkthm{rem}{Remark}
 \mkthm{note}{Note}
+\mkthm{notation}{Notation}
 
 \newenvironment{solution}
   {\begin{proof}[Solution]}
   {\end{proof}}
   
-\newcommand{\useHappyQED}{\renewcommand{\qedsymbol}{\smiley{}}}
+  
+% TODO: fix, probably with tikz
+\newcommand{\useHappyQED}{%
+    %\usepackage{fontawesome}
+    \usepackage{fontspec}
+    \newfontfamily\FontSmile{Times}
+    \renewcommand{\qedsymbol}{:)}%{\faSmile}%{{\FontSmile ☺}}
+}
