@@ -1,0 +1,740 @@
+% xor package
+% 
+% (c) Miguel Young
+%
+%% This program can be redistributed and/or modified under the terms
+%% of the LaTeX Project Public License Distributed from CTAN archives
+%% in directory macros/latex/base/lppl.txt.
+% 
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{xor}
+  [2015/01/01 v1.00 Xor LaTeX Suite]
+
+%%% IMPORTS %%%
+\RequirePackage{amsthm}
+\RequirePackage{verbatim}
+\RequirePackage{bm}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{amsfonts}
+\RequirePackage{scalerel}
+\RequirePackage{ifthen}
+\RequirePackage{xstring}
+\RequirePackage{graphicx}
+\RequirePackage{mathalfa}
+\RequirePackage{accsupp}
+\RequirePackage{verbatim}
+\RequirePackage{xcolor}
+\RequirePackage{esint}
+\RequirePackage{mathtools}
+%%% IMPORTS %%%
+
+%%% FONT STUFF %%%
+\def\amsbb{\use@mathgroup \M@U \symAMSb}
+
+\RequirePackage[no-math]{fontspec}
+\RequirePackage{xunicode}
+\newfontfamily\xitsbb{XITS Math}
+
+\RequirePackage{bbold}
+\let\bbold\mathbb
+
+\let\amscal\mathcal
+\DeclareMathAlphabet{\othercal}{OT1}{pzc}{m}{it}
+
+\usepackage{bm}
+\def\mathbf#1{\bm{\mathrm{#1}}}
+%%% FONT STUFF %%%
+
+%%% OPTIONS %%%
+\newcommand{\checkfor}[2]{%
+    \ifcsname#1\endcsname%
+        #2%
+    \fi%
+}
+\ProcessOptions\relax
+%%% OPTIONS %%%
+
+%%% Theorems %%%
+
+% shorthand for theorem generation
+\newcommand{\mkthm@}[2]{%
+    \newtheorem{S#1}{#2}[section]
+    \newtheorem{#1}{#2}
+    \newtheorem*{#1*}{#2}
+}
+
+\newcommand{\mkprf@}[2]{%
+    \newenvironment{#1}
+        {\begin{proof}[#2]}
+        {\end{proof}}
+}
+
+\mkthm@{thm}{Theorem}
+\mkthm@{lem}{Lemma}
+\mkthm@{prop}{Proposition}
+\mkthm@{cor}{Corollary}
+
+\theoremstyle{definition}
+
+\mkthm@{defn}{Definition}
+\mkthm@{axi}{Axiom}
+\mkthm@{conj}{Conjecture}
+\mkthm@{example}{Example}
+\mkthm@{exercise}{Exercise}
+\mkthm@{fact}{Fact}
+
+\theoremstyle{remark}
+
+\mkthm@{rem}{Remark}
+\mkthm@{note}{Note}
+\mkthm@{notation}{Notation}
+  
+\mkprf@{solution}{Solution}
+  
+% TODO: fix, probably with tikz
+\newcommand{\useHappyQED}{%
+    \newfontfamily\FontSmile{Times}
+    \renewcommand{\qedsymbol}{:)}%{\faSmile}%{{\FontSmile ☺}}
+}
+
+%%% Variables %%%
+
+\input{misc}
+
+\def\xhar{\xitsbb\char}
+\newcommand{\tobb}[1]{%
+\ifthenelse{\equal{#1}{a}}{\xhar"1D552}{%
+\ifthenelse{\equal{#1}{b}}{\xhar"1D553}{%
+\ifthenelse{\equal{#1}{c}}{\xhar"1D554}{%
+\ifthenelse{\equal{#1}{d}}{\xhar"1D555}{%
+\ifthenelse{\equal{#1}{e}}{\xhar"1D556}{%
+\ifthenelse{\equal{#1}{f}}{\xhar"1D557}{%
+\ifthenelse{\equal{#1}{g}}{\xhar"1D558}{%
+\ifthenelse{\equal{#1}{h}}{\xhar"1D559}{%
+\ifthenelse{\equal{#1}{i}}{\xhar"1D55A}{%
+\ifthenelse{\equal{#1}{j}}{\xhar"1D55B}{%
+\ifthenelse{\equal{#1}{k}}{\xhar"1D55C}{%
+\ifthenelse{\equal{#1}{l}}{\xhar"1D55D}{%
+\ifthenelse{\equal{#1}{m}}{\xhar"1D55E}{%
+\ifthenelse{\equal{#1}{n}}{\xhar"1D55F}{%
+\ifthenelse{\equal{#1}{o}}{\xhar"1D560}{%
+\ifthenelse{\equal{#1}{p}}{\xhar"1D561}{%
+\ifthenelse{\equal{#1}{q}}{\xhar"1D562}{%
+\ifthenelse{\equal{#1}{r}}{\xhar"1D563}{%
+\ifthenelse{\equal{#1}{s}}{\xhar"1D564}{%
+\ifthenelse{\equal{#1}{t}}{\xhar"1D565}{%
+\ifthenelse{\equal{#1}{u}}{\xhar"1D566}{%
+\ifthenelse{\equal{#1}{v}}{\xhar"1D567}{%
+\ifthenelse{\equal{#1}{w}}{\xhar"1D568}{%
+\ifthenelse{\equal{#1}{x}}{\xhar"1D569}{%
+\ifthenelse{\equal{#1}{y}}{\xhar"1D56A}{%
+\ifthenelse{\equal{#1}{z}}{\xhar"1D56B}{%
+%
+\ifthenelse{\equal{#1}{0}}{\xhar"1D7D8}{%
+%\ifthenelse{\equal{#1}{1}}{\xhar"1D7D9}{%
+\ifthenelse{\equal{#1}{2}}{\xhar"1D7DA}{%
+\ifthenelse{\equal{#1}{3}}{\xhar"1D7DB}{%
+\ifthenelse{\equal{#1}{4}}{\xhar"1D7DC}{%
+\ifthenelse{\equal{#1}{5}}{\xhar"1D7DD}{%
+\ifthenelse{\equal{#1}{6}}{\xhar"1D7DE}{%
+%\ifthenelse{\equal{#1}{7}}{\xhar"1D7DF}{%
+\ifthenelse{\equal{#1}{8}}{\xhar"1D7E0}{%
+\ifthenelse{\equal{#1}{9}}{\xhar"1D7E1}{%
+%
+\ifthenelse{\equal{#1}{\pi}}{\xhar"0213C}{%
+\ifthenelse{\equal{#1}{\gamma}}{\xhar"0213D}{%
+\ifthenelse{\equal{#1}{\Gamma}}{\xhar"0213E}{%
+\ifthenelse{\equal{#1}{\Pi}}{\xhar"0213F}{%
+$\bbold{#1}$%
+}}}}%
+}}}}}}}}}}%
+}}}}}}}}}}}}}}}}}}}}}}}}%}%}%
+}
+
+\newcommand{\otherbb}[1]{\text{\tobb{#1}}}
+
+%\def\othercal#1{\vstretch{1.2}{\hstretch{1.2}{\pzccal{#1}}}}
+
+% Magic for mathbb/mathcal %
+\newcommand{\ifCap}[3]{{\ifthenelse{
+    \equal{#1}{A} \OR \equal{#1}{B} \OR \equal{#1}{C} \OR \equal{#1}{D} \OR
+    \equal{#1}{E} \OR \equal{#1}{F} \OR \equal{#1}{G} \OR \equal{#1}{H} \OR
+    \equal{#1}{I} \OR \equal{#1}{J} \OR \equal{#1}{K} \OR \equal{#1}{L} \OR
+    \equal{#1}{M} \OR \equal{#1}{N} \OR \equal{#1}{O} \OR \equal{#1}{P} \OR
+    \equal{#1}{Q} \OR \equal{#1}{R} \OR \equal{#1}{S} \OR \equal{#1}{T} \OR
+    \equal{#1}{U} \OR \equal{#1}{V} \OR \equal{#1}{W} \OR \equal{#1}{X} \OR
+    \equal{#1}{Y} \OR \equal{#1}{Z}
+}{\call{#2}{#1}}{\call{#3}{#1}}}}
+
+\def\bbouter#1{\bbloop#1\relax}
+\def\bbloop#1{\ifx\relax#1\else\ifCap{#1}{amsbb}{otherbb}\expandafter\bbloop\fi}
+\def\mathbb#1{\expandafter\bbouter\expandafter{#1}}
+
+\def\calouter#1{\calloop#1\relax}
+\def\calloop#1{\ifx\relax#1\else\ifCap{#1}{amscal}{othercal}\expandafter\calloop\fi}
+\def\mathcal#1{\expandafter\calouter\expandafter{#1}}
+% End Magic %
+
+%% Formats %%
+\newcommand{\idcommand}[1]{#1}
+\newcommand{\ivect}{\bm}
+\newcommand{\vect}{\mathbf}
+\newcommand{\veca}[1]{\vec{\mathbf{#1}}}
+\newcommand{\cat}{\mathcal}
+\newcommand{\namedCat}{\mathbf}
+\newcommand{\newcat}[1]{\expandafter\newcommand\csname c#1\endcsname{\namedCat{#1}}}
+\newcommand{\fld}{\mathbb}
+\newcommand{\lie}{\mathfrak}
+\newcommand{\rmn}{\mathrm}
+
+\newcommand{\usevec}{\renewcommand{\vect}{\vec}}
+\newcommand{\useveca}{\renewcommand{\vect}{\veca}}
+\newcommand{\usevect}{\renewcommand{\vect}{\mathbf}}
+
+\def\mkletter@#1#2#3{%
+    \expandafter\providecommand\csname#2#1\endcsname
+        {\csname#3\endcsname{#1}}
+}
+% \@mkalph{prefix}{command}
+\def\mkalph@#1#2{%
+    \mkletter@{a}{#1}{#2} \mkletter@{j}{#1}{#2} \mkletter@{s}{#1}{#2}
+    \mkletter@{b}{#1}{#2} \mkletter@{k}{#1}{#2} \mkletter@{t}{#1}{#2}
+    \mkletter@{c}{#1}{#2} \mkletter@{l}{#1}{#2} \mkletter@{u}{#1}{#2}
+    \mkletter@{d}{#1}{#2} \mkletter@{m}{#1}{#2} \mkletter@{v}{#1}{#2}
+    \mkletter@{e}{#1}{#2} \mkletter@{n}{#1}{#2} \mkletter@{w}{#1}{#2}
+    \mkletter@{f}{#1}{#2} \mkletter@{o}{#1}{#2} \mkletter@{x}{#1}{#2}
+    \mkletter@{g}{#1}{#2} \mkletter@{p}{#1}{#2} \mkletter@{y}{#1}{#2}
+    \mkletter@{h}{#1}{#2} \mkletter@{q}{#1}{#2} \mkletter@{z}{#1}{#2}
+    \mkletter@{i}{#1}{#2} \mkletter@{r}{#1}{#2}
+    
+    \mkletter@{A}{#1}{#2} \mkletter@{J}{#1}{#2} \mkletter@{S}{#1}{#2}
+    \mkletter@{B}{#1}{#2} \mkletter@{K}{#1}{#2} \mkletter@{T}{#1}{#2}
+    \mkletter@{C}{#1}{#2} \mkletter@{L}{#1}{#2} \mkletter@{U}{#1}{#2}
+    \mkletter@{D}{#1}{#2} \mkletter@{M}{#1}{#2} \mkletter@{V}{#1}{#2}
+    \mkletter@{E}{#1}{#2} \mkletter@{N}{#1}{#2} \mkletter@{W}{#1}{#2}
+    \mkletter@{F}{#1}{#2} \mkletter@{O}{#1}{#2} \mkletter@{X}{#1}{#2}
+    \mkletter@{G}{#1}{#2} \mkletter@{P}{#1}{#2} \mkletter@{Y}{#1}{#2}
+    \mkletter@{H}{#1}{#2} \mkletter@{Q}{#1}{#2} \mkletter@{Z}{#1}{#2}
+    \mkletter@{I}{#1}{#2} \mkletter@{R}{#1}{#2}
+}
+
+%% Shorthands %%
+\newcommand{\vl}{\vect{\ell}}
+\newcommand{\vii}{\bm{\textnormal{\bfseries\i}}}
+\newcommand{\vjj}{\bm{\textnormal{\bfseries\j}}}
+\newcommand{\fii}{\fld{i}}
+
+\newcommand{\vzero}{\vect{0}}
+\newcommand{\vone}{\vect{1}}
+\newcommand{\vtwo}{\vect{2}}
+\newcommand{\vthree}{\vect{3}}
+\newcommand{\vfour}{\vect{4}}
+\newcommand{\vfive}{\vect{5}}
+
+\mkalph@{v}{vect} % vectors
+\mkalph@{iv}{ivect} % italic vectors
+\mkalph@{L}{lie}  % fracktur (lie)
+\mkalph@{C}{cat}  % calligraphy
+\mkalph@{f}{fld}  % black board
+ 
+% Greek %
+\newcommand{\al}{\alpha}
+\newcommand{\be}{\beta}
+\newcommand{\ga}{\gamma}
+\newcommand{\Ga}{\Gamma}
+\newcommand{\de}{\delta}
+\newcommand{\De}{\Delta}
+\newcommand{\la}{\lambda}
+\newcommand{\lla}{\Lambda}
+\newcommand{\te}{\theta}
+\newcommand{\Te}{\Theta}
+\newcommand{\ka}{\kappa}
+\newcommand{\si}{\sigma}
+\newcommand{\vsi}{\varsigma}
+\newcommand{\Si}{\Sigma}
+\newcommand{\om}{\omega}
+\newcommand{\Om}{\Omega}
+\newcommand{\ze}{\zeta}
+\newcommand{\ep}{\varepsilon}
+\newcommand{\epp}{\epsion}
+\newcommand{\Ph}{\Phi}
+\newcommand{\ph}{\varphi}
+\newcommand{\Ps}{\Psi}
+\newcommand{\ps}{\psi}
+\newcommand{\ups}{\upsilon}
+
+% Misc %
+\newcommand{\eset}{\varnothing}
+
+\newcommand{\ii}{\imath}
+\newcommand{\jj}{\jmath}
+
+%% Common Variables %%
+
+% Number Systems %
+\newcommand{\N}{\fN} % natural numbers
+\newcommand{\Z}{\fZ} % integers
+\newcommand{\Q}{\fQ} % rational numbers
+\newcommand{\R}{\fR} % real numbers
+\newcommand{\C}{\fC} % complex numbers
+
+\newcommand{\GL}{GL}
+\newcommand{\SL}{SL}
+\newcommand{\SO}{SO}
+\newcommand{\SU}{SU}
+
+% Categories %
+\newcommand{\cDel}{\hstretch{0.8}{\varDelta}}
+
+\newcat{Ab}     % abelian groups / homomorphisms
+\newcat{AbCat}  % Ab categories / additive functors
+\newcat{Alg}    % algebras / homomorphisms
+\newcat{Ban}    % Banach spaces / linear maps of norm leq 1
+\newcat{CAlg}   % commutative algebras / homomorphisms
+\newcat{Cat}    % categories / functors
+\newcat{CAT}    % large categories / functors
+\newcat{Cls}    % classes / functions
+\newcat{CMet}   % complete metric spaces / metric-preserving functions
+\newcat{Cone}   % cones
+\newcat{CRing}  % commutative rings / homomorphisms
+\newcat{CRng}   % " / "
+\newcat{DGMod}  % differential graded modules
+\newcat{Dom}    % integral domains / homomorphisms
+\newcat{End}    % endofunctors / natural transformations
+\newcat{Ens}    % ensambles / functions
+\newcat{Fin}    % finite sets / functions
+\newcat{Finord} % finite ordinals / order-preserving functions
+\newcat{Fld}    % fields / homomorphisms
+\newcat{Funct}  % functors / natural transformations
+\newcat{GMod}   % graded modules / linear maps
+\newcat{Grp}    % groups / homomorphisms
+\newcat{Gpd}    % groupoids / homomorphisms
+\newcat{Grph}   % graphs / morphisms of graphs
+\newcat{Matr}   % natural numbers / matrices
+\newcat{Met}    % metric spaces / metric-preserving maps
+\newcat{Mod}    % modules / linear maps
+\newcat{Mon}    % monoids / homomorphisms
+\newcat{Moncat} % monoidal categories / monoidal functors
+\newcat{Mor}    % ...?
+\newcat{Nat}    % natural transformations
+\newcat{Open}   % open subsets / inclusions
+\newcat{Ord}    % ordered sets / order-preserving maps
+\newcat{Rel}    % relations / relation-preserving maps
+\newcat{Ring}   % rings / homomorphisms
+\newcat{Rng}    % " / "
+\newcat{Set}    % sets / functions
+\newcat{Top}    % topological spaces / continuous maps
+\newcat{Toph}   % topological spaces / homotopy classes
+\newcat{Vct}    % vector spaces / linear maps
+\newcat{Vect}   % " / "
+
+%%% Delimiters %%%
+
+\newcommand{\LeftRight}[5]{
+    \scalerel[2ex]{#3}{\vphantom{\left#1#4\right.}}
+    #4
+    \scalerel[2ex]{#5}{\vphantom{\left#2#4\right.}}
+}
+
+\newcommand{\newdelim}[3]{%
+    \expandafter\newcommand\csname#1\endcsname[1]{%
+        \left#2##1\right#3
+    }
+}
+\newcommand{\newDelim}[5]{%
+    \expandafter\newcommand\csname#1\endcsname[1]{%
+        \LeftRight{#2}{#3}{#4}{##1}{#5}
+    }
+}
+
+\newcommand{\spacechoice}[4]{
+    \mathchoice{\hspace{#1}}{\hspace{#2}}{\hspace{#3}}{\hspace{#4}}}
+
+% ()
+\providecommand{\lparens}{(}
+\providecommand{\rparens}{)}
+\providecommand{\llparens}
+    {(\spacechoice{-2.1pt}{-2.1pt}{-1.7pt}{-1.7pt}|\hspace{-0.7pt}}
+\providecommand{\rrparens}
+    {\hspace{-0.7pt}|\spacechoice{-2.1pt}{-2.1pt}{-1.7pt}{-1.7pt})}
+
+\newdelim{Par}{\lparens}{\rparens}
+\newDelim{Paar}{(}{)}{\llparens}{\rrparens}
+
+% []
+\providecommand{\lbrack}{[}
+\providecommand{\rbrack}{]}
+\providecommand{\llbrack}
+    {\mathchoice{\bigg[}{\big[}{[}{[}\spacechoice{-4pt}{-3.1pt}{-1.3pt}{-1.2pt}
+        \mathchoice{\bigg[}{\big[}{[}{[}\hspace{-0.4pt}}
+\providecommand{\rrbrack}
+    {\hspace{-0.4pt}\mathchoice{\bigg]}{\big]}{]}{]}
+        \spacechoice{-4pt}{-3.1pt}{-1.3pt}{-1.2pt}\mathchoice{\bigg]}{\big]}{]}{]}}
+
+\newdelim{Squ}{\lbrack}{\rbrack}
+\newDelim{Sqqu}{[}{]}{\llbrack}{\rrbrack}
+
+\newcommand{\LieSeparator}{,}
+\newcommand{\Lie}[2]{\Squ{#1 \LieSeparator #2}}
+
+% [) (]
+\newdelim{PSqu}{\lparens}{\rbrack}
+\newdelim{SPar}{\lbrack}{\rparens}
+\newDelim{PSqqu}{(}{]}{\llparens}{\rrbrack}
+\newDelim{SPaar}{[}{)}{\llbrack}{\rrparens}
+
+% {}
+\providecommand{\lbrace}{\{}
+\providecommand{\rbrace}{\}}
+\providecommand{\llbrace}
+    {\mathchoice{\{}{\{}{\{}{\{}\spacechoice{-3.0pt}{-3.2pt}{-2.5pt}{-2.5pt}
+        \mathchoice{\hstretch{1.5}{|}}{\hstretch{1.5}{|}}
+            {\hstretch{1.5}{|}}{\hstretch{1.5}{|}}\hspace{-0.7pt}}
+\providecommand{\rrbrace}
+    {\hspace{-0.7pt}\mathchoice{\hstretch{1.5}{|}}{\hstretch{1.5}{|}}
+            {\hstretch{1.5}{|}}{\hstretch{1.5}{|}}\spacechoice{-3.2pt}{-3.2pt}{-2.5pt}
+                {-2.5pt}\mathchoice{\}}{\}}{\}}{\}}}
+
+\newdelim{Cur}{\lbrace}{\rbrace}
+\newDelim{Cuur}{\{}{\}}{\llbrace}{\rrbrace}
+    
+% ||
+\newdelim{Abs}{|}{|}
+\newdelim{Abbs}{\Vert}{\Vert}
+\newcommand{\Nor}[1]{\Abbs{#1}}
+
+% Ceiling and Floor
+\newdelim{Ceil}{\lceil}{\rceil}
+\newdelim{Flo}{\lfloor}{\rfloor}
+
+% <>
+\newDelim{Ang}{(}{)}
+    {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}}
+    {\mathchoice{\bigg\rangle}{\rangle}{\rangle}{\rangle}}
+\newDelim{Anng}{(}{)}
+    {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}
+        \spacechoice{-3.95pt}{-2.3pt}{-1.8pt}{-1.8pt}
+            \mathchoice{\hstretch{1.5}{\bigg|}}{|}{|}{|}}
+    {\mathchoice{\hstretch{1.5}{\bigg|}}{|}{|}{|}
+        \spacechoice{-3.95pt}{-2.3pt}{-1.8pt}{-1.8pt}
+            \mathchoice{\bigg\rangle}{\rangle}{\rangle}{\rangle}}
+
+% f|
+\newdelim{restr}{.}{|}
+
+% Comprehension {|}
+\newcommand{\mkset}[2]{\left\{#1\,\middle|\,#2\right\}}
+
+% <|
+\newDelim{Bra}{(}{)}
+    {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}}
+    {\mathchoice{\bigg|}{|}{|}{|}}
+
+% |>
+\newDelim{Ket}{(}{)}
+    {\mathchoice{\bigg|}{|}{|}{|}}
+    {\mathchoice{\bigg\rangle}{\rangle}{\rangle}{\rangle}}
+
+% Bra-Ket <|>
+\newcommand{\BraKet}[2]{\left\langle#1\,\middle|\,#2\right\rangle}
+
+%% Derivatives of the above %%
+\newcommand{\angprod}{\Ang{\cdot\,,\cdot}}
+\newcommand{\lieprod}{\Squ{\cdot\,,\cdot}}
+\newcommand{\absprod}{\Abs{\cdot}}
+\newcommand{\norprod}{\Nor{\cdot}}
+
+%%% Operators %%%
+
+%% Linear Alg %%
+\DeclareMathOperator{\img}{im}
+\newcommand{\image}{\img} %% deprecated
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\sign}{sign}
+\newcommand{\transp}{^{\mathrm{T}}}
+\newcommand{\cotran}{^\dagger}
+\newcommand{\opp}{^{\mathrm{op}}}
+\newcommand{\dual}{^*}
+\newcommand{\comp}{^c}
+\DeclareMathOperator{\tr}{tr}
+
+\newcommand{\powset}[1]{\CP\left(#1\right)} 
+
+%% Categories %%
+\DeclareMathOperator{\Hom}{\cat{hom}} % hom-set
+\DeclareMathOperator{\Endo}{end}      % endomorphism
+\DeclareMathOperator{\Aut}{aut}       % automorphism
+\DeclareMathOperator{\Obj}{\cat{obj}} % category objects
+\DeclareMathOperator{\Mor}{\cat{mor}} % category morphisms
+\DeclareMathOperator{\Dom}{\cat{dom}} % domain
+\DeclareMathOperator{\Cod}{\cat{cod}} % codomain
+\newcommand*\prd{\times}              % product
+\newcommand{\coprd}{\amalg}           % coproduct 
+\newcommand{\Colim}{\varinjlim}       % colimit
+\newcommand{\Lim}{\varprojlim}        % lim
+\newcommand{\Id}{\cat{id}}            % category identity map
+
+\DeclareMathOperator{\Rad}{\cat{rad}} 
+  
+%% Topology %%
+\DeclareMathOperator{\Int}{Int} % interior
+\DeclareMathOperator{\Ext}{Ext} % exteriror
+\DeclareMathOperator{\Bd}{Bd}   % boundary
+ 
+%% Analysis %% 
+ 
+% this defines what dx actually looks like %
+\newcommand{\diff}{\mathrm{\mathstrut d}}
+ 
+% low-level tex for dx, via ISO-31 %
+\makeatletter
+\providecommand*{\rawdiff}{\@ifnextchar^{\DIfF}{\DIfF^{}}}
+\def\DIfF^#1{\mathop{\diff}\nolimits^{#1}\gobblespace}
+\def\gobblespace{\futurelet\diffarg\opspace}
+\def\opspace{\let\DiffSpace\!\ifx\diffarg(\let\DiffSpace\relax\else\ifx\diffarg[\let\DiffSpace\relax\else\ifx\diffarg\{\let\DiffSpace\relax\fi\fi\fi\DiffSpace}
+% %
+ 
+\newcommand{\D}{\rawdiff}
+\newcommand{\DD}{\mathrm{D}}
+\newcommand{\del}{\partial}
+\newcommand{\nab}{\nabla}
+% \leib[2]{d}{f}{x} -> (d^2 f)/dx^2
+\providecommand*{\leib}[4][]{\frac{#2^{#1}#3}{#2 #4^{#1}}}
+
+\newcommand{\od}[3][]{\leib[#1]{\D}{#2}{#3}}
+\newcommand{\Dd}[3][]{\leib[#1]{\DD}{#2}{#3}}
+\newcommand{\pd}[3][]{\leib[#1]{\del}{#2}{#3}}
+
+\newcommand{\cnt}{\CC} % function ranks, e.g. \cnt^0 -> continuous functions
+\newcommand{\rie}{\LR} % riemann integrable funcs
+\newcommand{\lbe}{\CL} % lebesgue integrable funcs
+ 
+%% Vect Calc %%
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\dive}{div}
+\DeclareMathOperator{\curl}{curl}
+
+\newcommand{\Grad}{\nabla}
+\newcommand{\Dive}{\nabla\cdot}
+\newcommand{\Curl}{\nabla\times}
+\newcommand{\laplace}{\nabla^2}
+
+%% Wordz %%
+\newcommand{\AND}{\,\mathrm{and}\,}
+\newcommand{\OR}{\,\mathrm{or}\,}
+\newcommand{\XOR}{\,\mathrm{xor}\,}
+\newcommand{\IF}{\,\mathrm{if}\,}
+\newcommand{\IFF}{\,\mathrm{iff}\,}
+\newcommand{\ST}{\,\mathrm{s.t.}\,}
+\newcommand{\OTHER}{\,\mathrm{otherwise}\,}
+\newcommand{\ELSE}{\,\mathrm{else}\,}
+\newcommand{\IN}{\,\mathrm{in}\,}
+ 
+%% Misc %%
+\renewcommand{\to}{\rightarrow}
+\newcommand{\toto}{\rightrightarrows}
+\newcommand{\from}{\leftarrow}
+\newcommand{\fromfrom}{\leftleftarrows}
+\newcommand{\fromto}{\leftrightarrow}
+\newcommand{\down}{\downarrow}
+\newcommand{\downdown}{\downdownarrows}
+\newcommand{\toself}{\circlearrowright}
+\newcommand{\inj}{\hookrightarrow}
+\newcommand{\srj}{\rightarrow\!\!\!\!\!\!\!\rightarrow}
+\newcommand{\nato}{\rmap{\hstretch{2}{\vstretch{2}{.}}}}
+\newcommand{\adj}{\rightharpoonup}
+
+\newcommand{\nto}{\not\to}
+\DeclareMathOperator{\ide}{id}
+
+\newcommand{\rmap}[1]{\xrightarrow{#1}}
+\newcommand{\lmap}[1]{\xleftarrow{#1}}
+
+\DeclareMathOperator{\lcd}{lcd} 
+\renewcommand{\mod}[1]{\left(\mathrm{mod}\,#1\right)}
+
+\newcommand{\nin}{\notin}
+\newcommand{\subS}{\subseteq}
+\newcommand{\supS}{\supseteq}
+
+\newcommand{\ind}{\fld{1}}
+\newcommand{\isom}{\simeq}
+\renewcommand{\cong}{\equiv}
+\newcommand{\isdef}{:=}
+
+\newcommand{\ov}{\overline}
+\newcommand{\un}{\underline}
+
+\newcommand{\jacobi}[2]{\Par{\frac{#1}{#2}}}
+
+%%% Pset templating %%%
+%% TODO: make this a class
+
+\newcommand{\psetSubject}[1]{\def\pset@subject{#1}}
+\def\pset@subject{undefined}
+
+\newcommand{\psetAuthor}[1]{\def\pset@author{#1}}
+\def\pset@author{Miguel Young}
+
+\newcommand{\psetNum}[1]{\def\pset@num{#1}}
+\def\pset@num{undefined}
+
+\newcommand{\psetCollabs}[1]{\def\pset@collabs{#1}}
+\def\pset@collabs{}
+
+\newcommand{\psetSources}[1]{\def\pset@sources{#1}}
+\def\pset@sources{}
+
+\newcommand{\psetTitle}[1]{%
+    \newpage
+    \begin{center}
+        \makeatletter
+        {\huge \pset@subject{} Pset \pset@num{} #1 }
+
+        {\large \pset@author}
+
+        \ifthenelse{\equal{\pset@collabs}{}}{}{Collaborators: \pset@collabs}
+        
+        \ifthenelse{\equal{\pset@sources}{}}{}{Sources: \pset@sources}
+        \makeatother
+    \end{center}
+}
+
+\newcommand{\makePsetTitle}{\psetTitle{}}
+\newcommand{\mkPsetTitle}{\makePsetTitle}
+
+\newcounter{pset@ProblemCounter}
+\setcounter{pset@ProblemCounter}{0}
+\newenvironment{psetProblem}{%
+    \makeatletter
+    \stepcounter{pset@ProblemCounter}
+    \psetTitle{Problem \arabic{pset@ProblemCounter}}
+    \makeatother
+}{}
+
+%%% Matrices %%%
+%% Square %%
+
+\newcommand{\btwo}[4]{%
+    \begin{bmatrix}
+        #1 & #2 \\ #3 & #4
+    \end{bmatrix}
+}
+
+
+\newcommand{\bthree}[9]{%
+    \begin{bmatrix}
+        #1 & #2 & #3 \\ 
+        #4 & #5 & #6 \\
+        #7 & #8 & #9 
+    \end{bmatrix}
+}
+
+\newcommand{\Vbtwo}[2]{%
+    \begin{bmatrix}
+        #1 \\ #2
+    \end{bmatrix}
+}
+
+\newcommand{\Hbtwo}[2]{%
+    \begin{bmatrix}
+        #1 & #2
+    \end{bmatrix}
+}
+
+\newcommand{\Vbthree}[3]{%
+    \begin{bmatrix}
+        #1 \\ #2 \\ #3
+    \end{bmatrix}
+}
+
+\newcommand{\Hbthree}[3]{%
+    \begin{bmatrix}
+        #1 & #2 & #3
+    \end{bmatrix}
+}
+
+%% Round %%
+
+\newcommand{\ptwo}[4]{%
+    \begin{pmatrix}
+        #1 & #2 \\ 
+        #3 & #4
+    \end{pmatrix}
+}
+
+\newcommand{\pthree}[9]{%
+    \begin{pmatrix}
+        #1 & #2 & #3 \\ 
+        #4 & #5 & #6 \\
+        #7 & #8 & #9 
+    \end{pmatrix}
+}
+
+\newcommand{\Vptwo}[2]{%
+    \begin{pmatrix}
+        #1 \\ #2
+    \end{pmatrix}
+}
+
+\newcommand{\Hptwo}[2]{%
+    \begin{pmatrix}
+        #1 & #2
+    \end{pmatrix}
+}
+\newcommand{\Vpthree}[3]{%
+    \begin{pmatrix}
+        #1 \\ #2 \\ #3
+    \end{pmatrix}
+}
+
+\newcommand{\Hpthree}[3]{%
+    \begin{pmatrix}
+        #1 & #2 & #3
+    \end{pmatrix}
+}
+
+%% Vert %%
+
+\newcommand{\Vtwo}[4]{%
+    \begin{vmatrix}
+        #1 & #2 \\ 
+        #3 & #4
+    \end{vmatrix}
+}
+
+\newcommand{\Vthree}[9]{%
+    \begin{vmatrix}
+        #1 & #2 & #3 \\ 
+        #4 & #5 & #6 \\
+        #7 & #8 & #9 
+    \end{vmatrix}
+}
+
+\newcommand{\VVtwo}[2]{%
+    \begin{vmatrix}
+        #1 \\ #2
+    \end{vmatrix}
+}
+
+\newcommand{\HVtwo}[2]{%
+    \begin{vmatrix}
+        #1 & #2
+    \end{vmatrix}
+}
+\newcommand{\VVthree}[3]{%
+    \begin{vmatrix}
+        #1 \\ #2 \\ #3
+    \end{vmatrix}
+}
+
+\newcommand{\HVthree}[3]{%
+    \begin{vmatrix}
+        #1 & #2 & #3
+    \end{vmatrix}
+}
+
+\endinput
+%%
+%% End of file `xor.sty'.

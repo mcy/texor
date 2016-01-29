@@ -1,11 +1,9 @@
 \documentclass[11pt]{article}
 
-\input{pset}
 \input{ling}
-\input{math}
+\usepackage{xor}
 
 \useHappyQED
-%\useharpoon
 
 \begin{document}
 
@@ -13,11 +11,16 @@
 \psetSources{None}
 \mkPsetTitle{}
 
-\newcommand{\alphabet}{Aa\,Bb\,Cc\,Dd\,Ee\,Ff\,Gg\,Hh\,Ii\,Jj\,Kk\,Ll\,Mm\,Nn\,Oo\,Pp\,Qq\,Rr\,Ss\,Tt\,Uu\,Vv\,Ww\,Xx\,Yy\,Zz}
+\newcommand{\alphabet}{Aa\,Bb\,Cc\,Dd\,Ee\,Ff\,Gg\,Hh\,Ii\,Jj\,Kk\,Ll\,Mm}
+\newcommand{\alphabett}{Nn\,Oo\,Pp\,Qq\,Rr\,Ss\,Tt\,Uu\,Vv\,Ww\,Xx\,Yy\,Zz}
 \newcommand{\numbers}{1\,2\,3\,4\,5\,6\,7\,8\,9\,0}
+\newcommand{\greek}
+    {A\al\,B\be\,\Ga\ga\,\De\de\,E\ep\,Z\ze\,H\eta\,\Te\te\,I\iota\,K\ka\,\lla\la\,M\mu}
+\newcommand{\greekk}
+    {N\nu\,\Xi\xi\,Oo\,\Pi\pi\,P\rho\,\Si\si\vsi\,T\tau\,Y\ups\,\Ph\phi\ph\,X\chi\,\Ps\ps\,\Om\om}
 
 \begin{itemize}
-    \item Vect: $\vv$ $\vk$ $\vzero$ $\veca1$ $\vV\ve\vc\vt\vo\vr$
+    \item Vect: $\vv$ $\vk$ $\vzero$ $\vect1$ $\vV\ve\vc\vt\vo\vr$
     \item Lie: $\Lg$ $\Ls\Lu\Par{3}$ $\LL\Li\Le$
     \item Cal: $\CC$ $\CD$ $\CP$ $\CC\CA\CT\CE\CG\CO\CR\CY$
     \item Fld: $\fA$ $\fF$ $\fK$ $\fF\fI\fE\fL\fD$
@@ -40,49 +43,27 @@ Delimiters:
 \begin{center}
 \begin{tabular}{r|cccccc}
     \deltest{Par} 
+    %\deltest{Paar}
     \deltest{Squ}
-    \deltest{Sqqu}
+    %\deltest{Sqqu}
     \deltest{Cur}
+    %\deltest{Cuur}
     \deltest{Abs}
     \deltest{Nor}
 \end{tabular}
 \begin{tabular}{r|cccccc}
     \deltest{Ang}
+    %\deltest{Anng}
     \deltest{SPar}
+    %\deltest{SPaar}
     \deltest{PSqu}
+    %\deltest{PSqqu}
     \deltest{Ceil}
     \deltest{Flo}
     \deltest{Bra}
     \deltest{Ket}
 \end{tabular}
 \end{center}
-
-\begin{comment}
-    \begin{itemize}
-        \newcommand{\tallthing}{\begin{array}{c}1\\2\end{array}}
-        \newcommand{\deltest}[1]{\call{#1}{#1}\,\call{#1}{\tallthing}}
-        \item $\deltest{Par}$
-        \item $\deltest{Paar}$
-        \item $\deltest{Squ}$
-        \item $\deltest{Sqqu}$
-        \item $\deltest{PSqu}$
-        \item $\deltest{SPar}$
-        \item $\deltest{Cur}$
-        \item $\deltest{Cuur}$
-        \item $\deltest{Abs}$
-        \item $\deltest{Nor}$
-        \item $\deltest{Ceil}$
-        \item $\deltest{Flo}$
-        \item $\deltest{Ang}$
-        \item $\deltest{Bra}$
-        \item $\deltest{Ket}$
-        \item $\mkset{f}{\ph}$
-        \item $\BraKet{\CH}{\Psi}$
-    \end{itemize}
-\end{comment}
-
-%\[ \Cuur{x} \quad \Cuur{\coprod} \quad \Cuur{\coprod_\Cuur{x}} \]
-%\[ \Cur{x} \quad \Cur{\coprod} \quad \Cur{\coprod_\Cur{x}} \]
 
 \[ \mathbb{123456789} \]
 \[ \mathbb{mathbb\,field} \]
@@ -95,18 +76,34 @@ Delimiters:
 
 \[ \StrGobbleLeft{foo}{1} \]
 
-\[ \hat\vii \vjj \]
+\[ \hat{\vii} \vjj \]
 
 \[ A \srj B \inj C \]
 
-\[ \fld{\alphabet} \]
-\[ \fld{\numbers} \]
-\[ \cat{\alphabet} \]
-%\[ \cat{\numbers} \]
-\[ \lie{\alphabet} \]
-\[ \lie{\numbers} \]
-\[ \vect{\alphabet} \]
-\[ \vect{\numbers} \]
+\noindent
+$\greek$ \\
+$\greekk$ \\ \\
+$\fld{\alphabet}$ \\
+$\fld{\alphabett}$ \\
+$\fld{\numbers}$ \\
+$\fld{\greek}$ \\
+$\fld{\greekk}$ \\ \\
+$\cat{\alphabet}$ \\
+$\cat{\alphabett}$ \\
+$\cat{\numbers}$ \\ \\
+$\lie{\alphabet}$ \\
+$\lie{\alphabett}$ \\
+$\lie{\numbers}$ \\ \\
+$\vect{\alphabet}$ \\
+$\vect{\alphabett}$ \\
+$\vect{\numbers}$ \\ 
+$\vect{\greek}$ \\
+$\vect{\greekk}$ \\ \\
+$\ivect{\alphabet}$ \\
+$\ivect{\alphabett}$ \\
+$\ivect{\numbers}$ \\
+$\ivect{\greek}$ \\
+$\ivect{\greekk}$ \\
 
 \begin{eqnarray*}
     f &\in& \cnt^\om \\
