@@ -8,6 +8,8 @@
 \ProvidesPackage{texor}
   [2015/01/01 v1.0 teXor LaTeX Suite]
 
+\let\h@rpoon\rightharpoonup
+
 %%% IMPORTS %%%
 \RequirePackage{amsthm}
 \RequirePackage{verbatim}
@@ -25,6 +27,11 @@
 \RequirePackage{xcolor}
 \RequirePackage{esint}
 \RequirePackage{mathtools}
+\RequirePackage{xparse}
+\RequirePackage{mathrsfs}
+\RequirePackage{accents}
+\RequirePackage{tikz}
+\RequirePackage{tikz-cd}
 %%% IMPORTS %%%
 
 %%% FONT STUFF %%%
@@ -44,18 +51,30 @@
 \def\mathbf#1{\bm{\mathrm{#1}}}
 %%% FONT STUFF %%%
 
-%%% OPTIONS %%%
-\newcommand{\checkfor}[2]{%
-    \ifcsname#1\endcsname%
-        #2%
-    \fi%
-}
-\ProcessOptions\relax
-%%% OPTIONS %%%
+\newcommand{\TeXoR}
+    {\TeX \hspace{-0.875ex}{\raisebox{0.31ex}{o}}\hspace{-0.55ex}R}
 
-\newcommand{\TeXoR}{\TeX \hspace{-0.4ex}\raisebox{0.3ex}{o}\hspace{-0.1ex}R}
+\def\@x@{}
+\newcommand{\@exists}[3]{\ifx\@x@#1\@x@ #3 \else #2 \fi}
+
+%%% Preamble %%%
+\newcommand{\smallmargins}{\geometry{lmargin=1in,rmargin=1in}}
+
+\newcommand{\resetmargins}{\geometry{lmargin=2in,rmargin=2in}}
+
+\newcommand{\call}[1]{\csname#1\endcsname}
+
+\def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
+\let\endchangemargin=\endlist
+
+\newcommand{\oset}[3][0ex]{%
+  {\mathop{#3}\limits^{
+    \vbox to#1{\kern-2\ex@
+    \hbox{$#2$}\vss}}}}
 
 %%% Theorems %%%
+
+\let\defaultqed\qedsymbol
 
 % shorthand for theorem generation
 \newcommand{\mkthm@}[2]{%
@@ -64,10 +83,21 @@
     \newtheorem*{#1*}{#2}
 }
 
-\newcommand{\mkprf@}[2]{%
-    \newenvironment{#1}
-        {\begin{proof}[#2]}
+\def\deqsymbol{\smashtimes}
+\newenvironment{proof*}[1][Proof]
+    {\begin{proof}[#1]\def\qedsymbol{\deqsymbol}}
+    {\end{proof}\def\deqsymbol{\smashtimes}}
+
+\newcommand{\mkprf@}[3][]{%
+    \newenvironment{#2}
+        {\begin{proof}[#3] \@exists{#1}{\def\qedsymbol{#1}}{}}
         {\end{proof}}
+}
+
+\newcommand{\mkcontr@}[3][]{%
+    \newenvironment{#2}
+        {\begin{proof*}[#3] \@exists{#1}{\def\deqsymbol{#1}}{}}
+        {\end{proof*}}
 }
 
 \mkthm@{thm}{Theorem}
@@ -82,6 +112,7 @@
 \mkthm@{conj}{Conjecture}
 \mkthm@{example}{Example}
 \mkthm@{exercise}{Exercise}
+\mkthm@{prob}{Problem}
 \mkthm@{fact}{Fact}
 
 \theoremstyle{remark}
@@ -93,14 +124,18 @@
 \mkprf@{solution}{Solution}
   
 % TODO: fix, probably with tikz
+\let\qed@symbol\qedsymbol
 \newcommand{\useHappyQED}{%
-    \newfontfamily\FontSmile{Times}
-    \renewcommand{\qedsymbol}{:)}%{\faSmile}%{{\FontSmile ☺}}
+    \renewcommand{\qedsymbol}{:)}
+    \renewcommand{\deqsymbol}{:(}
+}
+
+\newcommand{\resetQED}{%
+    \renewcommand{\qedsymbol}{$\qed@symbol$}
+    \renewcommand{\deqsymbol}{$\smashtimes$}
 }
 
 %%% Variables %%%
-
-\input{misc}
 
 \def\xhar{\xitsbb\char}
 \newcommand{\tobb}[1]{%
@@ -177,9 +212,16 @@ $\bbold{#1}$%
 % End Magic %
 
 %% Formats %%
+%def\vec#1{\oset[-1.8pt]{\hstretch{0.7}{\mathbf{\scriptscriptstyle\h@rpoon}}}{#1}}
+%\usepackage{harpoon}
+%\newcommand*{\vec}[1]{\text{\overharp{\vstretch{0.4}{\scriptscriptstyle\h@rpoon}}{\ensuremath{#1}}{.7}}} 
+%\def\vec\rharp
+%#1{\overset{\scriptscriptstyle\h@rpoon}{\vphantom{a}{#1}}}
 \newcommand{\idcommand}[1]{#1}
 \newcommand{\ivect}{\bm}
 \newcommand{\vect}{\mathbf}
+\newcommand{\ihatt}[1]{\hat{\bm{#1}}}
+\newcommand{\hatt}[1]{\mathbf{\hat{#1}}}
 \newcommand{\veca}[1]{\vec{\mathbf{#1}}}
 \newcommand{\cat}{\mathcal}
 \newcommand{\namedCat}{\mathbf}
@@ -188,9 +230,21 @@ $\bbold{#1}$%
 \newcommand{\lie}{\mathfrak}
 \newcommand{\rmn}{\mathrm}
 
-\newcommand{\usevec}{\renewcommand{\vect}{\vec}}
-\newcommand{\useveca}{\renewcommand{\vect}{\veca}}
-\newcommand{\usevect}{\renewcommand{\vect}{\mathbf}}
+\newcommand{\usevec}{
+    \renewcommand{\vect}{\vec}
+    \renewcommand{\hatt}[1]{\hat{##1}}
+    \def\vnabla{\vec{\nabla}}
+   
+}
+\newcommand{\useveca}{
+    \renewcommand{\vect}{\veca}
+    \def\vnabla{\vec{\nabla}}
+}
+\newcommand{\usevect}{
+    \renewcommand{\vect}{\mathbf} 
+    \renewcommand{\hatt}[1]{\hat{\mathbf{##1}}}
+    \def\vnabla{\nabla}
+}
 
 \def\mkletter@#1#2#3{%
     \expandafter\providecommand\csname#2#1\endcsname
@@ -223,6 +277,10 @@ $\bbold{#1}$%
 \newcommand{\vl}{\vect{\ell}}
 \newcommand{\vii}{\bm{\textnormal{\bfseries\i}}}
 \newcommand{\vjj}{\bm{\textnormal{\bfseries\j}}}
+\newcommand{\hi}{\hat{\vii}}
+\newcommand{\hj}{\hat{\vjj}}
+\newcommand{\Hi}{\hat{\vii}}
+\newcommand{\Hj}{\hat{\vjj}}
 \newcommand{\fii}{\fld{i}}
 
 \newcommand{\vzero}{\vect{0}}
@@ -233,7 +291,10 @@ $\bbold{#1}$%
 \newcommand{\vfive}{\vect{5}}
 
 \mkalph@{v}{vect} % vectors
+\mkalph@{h}{hat} % hactors
+\mkalph@{H}{hatt} % hactors
 \mkalph@{iv}{ivect} % italic vectors
+\mkalph@{iH}{ihatt} % italic hactors
 \mkalph@{L}{lie}  % fracktur (lie)
 \mkalph@{C}{cat}  % calligraphy
 \mkalph@{f}{fld}  % black board
@@ -242,27 +303,49 @@ $\bbold{#1}$%
 \newcommand{\al}{\alpha}
 \newcommand{\be}{\beta}
 \newcommand{\ga}{\gamma}
-\newcommand{\Ga}{\Gamma}
 \newcommand{\de}{\delta}
-\newcommand{\De}{\Delta}
 \newcommand{\la}{\lambda}
-\newcommand{\lla}{\Lambda}
 \newcommand{\te}{\theta}
-\newcommand{\Te}{\Theta}
 \newcommand{\ka}{\kappa}
 \newcommand{\si}{\sigma}
-\newcommand{\vsi}{\varsigma}
-\newcommand{\Si}{\Sigma}
 \newcommand{\om}{\omega}
-\newcommand{\Om}{\Omega}
 \newcommand{\ze}{\zeta}
 \newcommand{\ep}{\varepsilon}
-\newcommand{\epp}{\epsion}
-\newcommand{\Ph}{\Phi}
 \newcommand{\ph}{\varphi}
-\newcommand{\Ps}{\Psi}
 \newcommand{\ps}{\psi}
 \newcommand{\ups}{\upsilon}
+
+\newcommand{\vte}{\vartheta}
+\newcommand{\vka}{\varkappa}
+\newcommand{\vsi}{\varsigma}
+\newcommand{\vep}{\epsilon}
+\newcommand{\vps}{\varpsi}
+\newcommand{\vrho}{\varrho}
+\newcommand{\vpi}{\varpi}
+
+\newcommand{\Ga}{\Gamma}
+\newcommand{\De}{\hstretch{0.9}{\Delta}}
+\newcommand{\lla}{\Lambda}
+\newcommand{\Te}{\Theta}
+\newcommand{\Si}{\Sigma}
+\newcommand{\Om}{\Omega}
+\newcommand{\Ph}{\Phi}
+\newcommand{\Ps}{\Psi}
+
+\newcommand{\vGa}{\varGamma}
+\newcommand{\vDe}{\hstretch{0.9}{\varDelta}}
+\newcommand{\vlla}{\varLambda}
+\newcommand{\vTe}{\varTheta}
+\newcommand{\vSi}{\varSigma}
+\newcommand{\vOm}{\varOmega}
+\newcommand{\vPs}{\varPsi}
+\newcommand{\vXi}{\varXi}
+\newcommand{\vPh}{\varPhi}
+\newcommand{\vPi}{\varPi}
+
+\let\bignabla\nabla
+\def\nabla{\hstretch{0.9}{\bignabla}}
+\def\vnabla{\nabla}
 
 % Misc %
 \newcommand{\eset}{\varnothing}
@@ -272,17 +355,24 @@ $\bbold{#1}$%
 
 %% Common Variables %%
 
+\let\pilcrow\P
+
 % Number Systems %
 \newcommand{\N}{\fN} % natural numbers
 \newcommand{\Z}{\fZ} % integers
 \newcommand{\Q}{\fQ} % rational numbers
 \newcommand{\R}{\fR} % real numbers
 \newcommand{\C}{\fC} % complex numbers
+\renewcommand{\P}{\fP} % PROJECTIVE SPACE!!!
 
-\newcommand{\GL}{GL}
-\newcommand{\SL}{SL}
-\newcommand{\SO}{SO}
-\newcommand{\SU}{SU}
+\newcommand{\newspgrp}[1]{
+    \expandafter\DeclareDocumentCommand\csname#1\endcsname{ O{} m }{\mathrm{GL}_{##1}\@exists{##2}{\!\Par{##2}}{}}
+}
+
+\newspgrp{GL}
+\newspgrp{SL}
+\newspgrp{SO}
+\newspgrp{SU}
 
 % Categories %
 \newcommand{\cDel}{\hstretch{0.8}{\varDelta}}
@@ -311,6 +401,8 @@ $\bbold{#1}$%
 \newcat{Grp}    % groups / homomorphisms
 \newcat{Gpd}    % groupoids / homomorphisms
 \newcat{Grph}   % graphs / morphisms of graphs
+\newcat{Lie}    % lie groups...?
+\newcat{Map}    % not actually a category
 \newcat{Matr}   % natural numbers / matrices
 \newcat{Met}    % metric spaces / metric-preserving maps
 \newcat{Mod}    % modules / linear maps
@@ -337,14 +429,15 @@ $\bbold{#1}$%
     \scalerel[2ex]{#5}{\vphantom{\left#2#4\right.}}
 }
 
-\newcommand{\newdelim}[3]{%
-    \expandafter\newcommand\csname#1\endcsname[1]{%
-        \left#2##1\right#3
+\DeclareDocumentCommand{\newdelim}{ O{} O{} m m m }{%
+    \expandafter\newcommand\csname #3\endcsname[1]{%
+        \left#4#1##1#2\right#5
     }
 }
-\newcommand{\newDelim}[5]{%
-    \expandafter\newcommand\csname#1\endcsname[1]{%
-        \LeftRight{#2}{#3}{#4}{##1}{#5}
+% \newDelim[linner][rinner][lmodel][rmodel]{name}{ldelim}{rdelim}
+\DeclareDocumentCommand{\newDelim}{ O{} O{} O{(} O{)} m m m }{%
+    \expandafter\newcommand\csname #5\endcsname[1]{%
+        \LeftRight{#3}{#4}{#6}{#1##1#2}{#7}
     }
 }
 
@@ -355,12 +448,16 @@ $\bbold{#1}$%
 \providecommand{\lparens}{(}
 \providecommand{\rparens}{)}
 \providecommand{\llparens}
-    {(\spacechoice{-2.1pt}{-2.1pt}{-1.7pt}{-1.7pt}|\hspace{-0.7pt}}
+    {\mathchoice{\bigg(}{\big(}{(}{(}
+        \spacechoice{-2.5pt}{-2.1pt}{-1.7pt}{-1.7pt}
+            \mathchoice{\hstretch{1.3}{\bigg|}}{\big|}{|}{|}\hspace{-0.7pt}}
 \providecommand{\rrparens}
-    {\hspace{-0.7pt}|\spacechoice{-2.1pt}{-2.1pt}{-1.7pt}{-1.7pt})}
+    {\mathchoice{\hstretch{1.3}{\bigg|}}{\big|}{|}{|}
+        \spacechoice{-2.5pt}{-2.1pt}{-1.7pt}{-1.7pt}
+            \mathchoice{\bigg)}{\big)}{)}{)}}
 
 \newdelim{Par}{\lparens}{\rparens}
-\newDelim{Paar}{(}{)}{\llparens}{\rrparens}
+\newDelim{Paar}{\llparens}{\rrparens}
 
 % []
 \providecommand{\lbrack}{[}
@@ -372,17 +469,19 @@ $\bbold{#1}$%
     {\hspace{-0.4pt}\mathchoice{\bigg]}{\big]}{]}{]}
         \spacechoice{-4pt}{-3.1pt}{-1.3pt}{-1.2pt}\mathchoice{\bigg]}{\big]}{]}{]}}
 
-\newdelim{Squ}{\lbrack}{\rbrack}
-\newDelim{Sqqu}{[}{]}{\llbrack}{\rrbrack}
+\newdelim[\spacechoice{2.2pt}{1pt}{0.8pt}{0.5pt}]
+    [\spacechoice{2.2pt}{1pt}{0.8pt}{0.5pt}]
+    {Squ}{\lbrack}{\rbrack}
+\newDelim{Sqqu}{\llbrack}{\rrbrack}
 
 \newcommand{\LieSeparator}{,}
 \newcommand{\Lie}[2]{\Squ{#1 \LieSeparator #2}}
 
 % [) (]
-\newdelim{PSqu}{\lparens}{\rbrack}
-\newdelim{SPar}{\lbrack}{\rparens}
-\newDelim{PSqqu}{(}{]}{\llparens}{\rrbrack}
-\newDelim{SPaar}{[}{)}{\llbrack}{\rrparens}
+\newdelim[][\spacechoice{1pt}{1pt}{0.8pt}{0.5pt}]{PSqu}{\lparens}{\rbrack}
+\newdelim[\spacechoice{1pt}{1pt}{0.8pt}{0.5pt}][]{SPar}{\lbrack}{\rparens}
+\newDelim{PSqqu}{\llparens}{\rrbrack}
+\newDelim{SPaar}{\llbrack}{\rrparens}
 
 % {}
 \providecommand{\lbrace}{\{}
@@ -396,23 +495,30 @@ $\bbold{#1}$%
             {\hstretch{1.5}{|}}{\hstretch{1.5}{|}}\spacechoice{-3.2pt}{-3.2pt}{-2.5pt}
                 {-2.5pt}\mathchoice{\}}{\}}{\}}{\}}}
 
-\newdelim{Cur}{\lbrace}{\rbrace}
-\newDelim{Cuur}{\{}{\}}{\llbrace}{\rrbrace}
+\newdelim[\spacechoice{1pt}{0pt}{0pt}{-0.5pt}]
+    [\spacechoice{1pt}{0pt}{0pt}{-0.5pt}]{Cur}{\lbrace}{\rbrace}
+\newDelim{Cuur}{\llbrace}{\rrbrace}
     
 % ||
-\newdelim{Abs}{|}{|}
+\newdelim%[\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}]
+    %[\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}]
+    {Abs}{|}{|}
 \newdelim{Abbs}{\Vert}{\Vert}
 \newcommand{\Nor}[1]{\Abbs{#1}}
 
 % Ceiling and Floor
-\newdelim{Ceil}{\lceil}{\rceil}
-\newdelim{Flo}{\lfloor}{\rfloor}
+\newdelim[\spacechoice{2.2pt}{0pt}{0pt}{-1pt}][\spacechoice{2.2pt}{0pt}{0pt}{-1pt}]
+    {Ceil}{\lceil}{\rceil}
+\newdelim[\spacechoice{2.2pt}{0pt}{0pt}{-1pt}][\spacechoice{2.2pt}{0pt}{0pt}{-1pt}]
+    {Flo}{\lfloor}{\rfloor}
 
 % <>
-\newDelim{Ang}{(}{)}
-    {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}}
-    {\mathchoice{\bigg\rangle}{\rangle}{\rangle}{\rangle}}
-\newDelim{Anng}{(}{)}
+% TODO: fix
+%\newDelim{Ang}
+%    {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}}
+%    {\mathchoice{\bigg\rangle}{\rangle}{\rangle}{\rangle}}
+\newdelim{Ang}{\langle}{\rangle}
+\newDelim{Anng}
     {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}
         \spacechoice{-3.95pt}{-2.3pt}{-1.8pt}{-1.8pt}
             \mathchoice{\hstretch{1.5}{\bigg|}}{|}{|}{|}}
@@ -423,21 +529,29 @@ $\bbold{#1}$%
 % f|
 \newdelim{restr}{.}{|}
 
-% Comprehension {|}
-\newcommand{\mkset}[2]{\left\{#1\,\middle|\,#2\right\}}
-
 % <|
-\newDelim{Bra}{(}{)}
-    {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}}
+\newdelim{Bra}{\langle}{|}
+
+\newDelim[][\spacechoice{1.6pt}{0.8pt}{0.8pt}{-0.5pt}]%
+    {@Bra}%
+    {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}}%
     {\mathchoice{\bigg|}{|}{|}{|}}
 
 % |>
-\newDelim{Ket}{(}{)}
-    {\mathchoice{\bigg|}{|}{|}{|}}
+\newdelim{Ket}{|}{\rangle}
+
+\newDelim[\spacechoice{1.6pt}{0.8pt}{0.8pt}{-0.5pt}][]%
+    {@Ket}%
+    {\mathchoice{\bigg|}{|}{|}{|}}%
     {\mathchoice{\bigg\rangle}{\rangle}{\rangle}{\rangle}}
 
-% Bra-Ket <|>
-\newcommand{\BraKet}[2]{\left\langle#1\,\middle|\,#2\right\rangle}
+% Comprehension {|}
+\newcommand{\mkset}[2]{\left.\Cur{#1\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}\middle|\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}#2}\right.}
+
+% Bra-Ket <|> <||>
+\newcommand{\BraKet}[2]{\left.\Ang{#1\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}\middle|\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}#2}\right.}
+
+\newcommand{\BrraKeet}[3]{\left.\Ang{#1\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}\middle|\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}#2\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}\middle|\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}#3}\right.}
 
 %% Derivatives of the above %%
 \newcommand{\angprod}{\Ang{\cdot\,,\cdot}}
@@ -447,8 +561,73 @@ $\bbold{#1}$%
 
 %%% Operators %%%
 
+\newcommand{\dfrc}[2]{\frac{\displaystyle{#1}}{\displaystyle{#2}}}
+
+%% bigops %%
+\newcommand{\newbigop}[2]{%
+    \expandafter\DeclareRobustCommand\csname#1\endcsname{%
+        
+        \mathop{\vphantom{\sum}\expandafter\mathpalette\csname#1@\endcsname\relax}\slimits@
+    }
+
+    \expandafter\newcommand\csname#1@\endcsname[2]{%
+        \vcenter{%
+            \sbox\z@{$##1\sum$}%
+            \hbox{\resizebox{.9\dimexpr\ht\z@+\dp\z@}{!}{$\ThisStyle{##1}\m@th#2$}}%
+        }%
+    }
+}
+
+%\let\@star\bigstar
+%\def\star{\scriptstyle{\@star}}
+\newbigop{bigstar}{\star}
+\newbigop{bigast}{\ast}
+
+\newcommand{\smash@display}{%
+\begin{tikzpicture}[rotate=45,x=0.5ex,y=0.5ex]
+\draw[line width=.095ex, line cap=round] (0,2) -- (3,2) (0,1) -- (3,1) (1,3) -- (1,0) (2,3) -- (2,0);
+\end{tikzpicture}
+}
+\newcommand{\smash@other}{%
+\begin{tikzpicture}[rotate=45,x=0.5ex,y=0.5ex]
+\draw[line width=.12ex, line cap=round] (0,2) -- (3,2) (0,1) -- (3,1) (1,3) -- (1,0) (2,3) -- (2,0);
+\end{tikzpicture}
+}
+
+\newcommand{\smashtimes}{\mathbin{\smash@other}}
+
+\newbigop{bigsmash}{\mathchoice{\smash@display}{\smash@other}{\smash@other}{\smash@other}}
+
+\newbigop{bighash}{\#}
+
+\newcommand{\plus@display}{%
+\begin{tikzpicture}%[rotate=45,x=0.5ex,y=0.5ex]
+\draw[line width=.4ex, line cap=round] (0,0) -- (1,0) (0.5,-0.5) -- (0.5,0.5);
+\end{tikzpicture}
+}
+\newcommand{\plus@other}{%
+\begin{tikzpicture}%[rotate=45,x=0.5ex,y=0.5ex]
+\draw[line width=0.6ex, line cap=round] (0,0) -- (1,0) (0.5,-0.5) -- (0.5,0.5);
+\end{tikzpicture}
+}
+
+\newcommand{\times@display}{%
+\begin{tikzpicture}[rotate=45,x=0.5ex,y=0.5ex]
+\draw[line width=.065ex, line cap=round] (0,1.5) -- (3,1.5) (1.5,3) -- (1.5,0);
+\end{tikzpicture}
+}
+\newcommand{\times@other}{%
+\begin{tikzpicture}[rotate=45,x=0.5ex,y=0.5ex]
+\draw[line width=.12ex, line cap=round] (0,1.5) -- (3,1.5) (1.5,3) -- (1.5,0);
+\end{tikzpicture}
+}
+
+\newbigop{bigplus}{\mathchoice{\plus@display}{\plus@other}{\plus@other}{\plus@other}}
+%\newbigop{bigtimes}{\mathchoice{\times@display}{\times@other}{\times@other}{\times@other}}
+
 %% Linear Alg %%
 \DeclareMathOperator{\img}{im}
+\DeclareMathOperator{\coker}{coker}
 \newcommand{\image}{\img} %% deprecated
 \DeclareMathOperator{\Span}{span}
 \DeclareMathOperator{\sign}{sign}
@@ -460,6 +639,10 @@ $\bbold{#1}$%
 \DeclareMathOperator{\tr}{tr}
 
 \newcommand{\powset}[1]{\CP\left(#1\right)} 
+
+% I'll be honest, I hate \Re and \Im
+\def\Re{\LR}%{\mathscr{R}}
+\def\Im{\LI}%{\mathscr{I}}
 
 %% Categories %%
 \DeclareMathOperator{\Hom}{\cat{hom}} % hom-set
@@ -498,7 +681,7 @@ $\bbold{#1}$%
 \newcommand{\D}{\rawdiff}
 \newcommand{\DD}{\mathrm{D}}
 \newcommand{\del}{\partial}
-\newcommand{\nab}{\nabla}
+%\newcommand{\nab}{\vnabla}
 % \leib[2]{d}{f}{x} -> (d^2 f)/dx^2
 \providecommand*{\leib}[4][]{\frac{#2^{#1}#3}{#2 #4^{#1}}}
 
@@ -515,10 +698,10 @@ $\bbold{#1}$%
 \DeclareMathOperator{\dive}{div}
 \DeclareMathOperator{\curl}{curl}
 
-\newcommand{\Grad}{\nabla}
-\newcommand{\Dive}{\nabla\cdot}
-\newcommand{\Curl}{\nabla\times}
-\newcommand{\laplace}{\nabla^2}
+\newcommand{\Grad}{\vnabla}
+\newcommand{\Dive}{\vnabla\cdot}
+\newcommand{\Curl}{\vnabla\times}
+\newcommand{\laplace}{\vnabla^2}
 
 %% Wordz %%
 \newcommand{\AND}{\,\mathrm{and}\,}
@@ -526,11 +709,12 @@ $\bbold{#1}$%
 \newcommand{\XOR}{\,\mathrm{xor}\,}
 \newcommand{\IF}{\,\mathrm{if}\,}
 \newcommand{\IFF}{\,\mathrm{iff}\,}
-\newcommand{\ST}{\,\mathrm{s.t.}\,}
+\newcommand{\ST}{\,\mathrm{such\,that}\,}
 \newcommand{\OTHER}{\,\mathrm{otherwise}\,}
 \newcommand{\ELSE}{\,\mathrm{else}\,}
 \newcommand{\IN}{\,\mathrm{in}\,}
- 
+\newcommand{\FOR}{\,\mathrm{for}\,} 
+
 %% Misc %%
 \renewcommand{\to}{\rightarrow}
 \newcommand{\toto}{\rightrightarrows}
@@ -544,6 +728,11 @@ $\bbold{#1}$%
 \newcommand{\srj}{\rightarrow\!\!\!\!\!\!\!\rightarrow}
 \newcommand{\nato}{\rmap{\hstretch{2}{\vstretch{2}{.}}}}
 \newcommand{\adj}{\rightharpoonup}
+\newcommand{\acts}{\curvearrowright}
+\newcommand{\acted}{\curvearrowleft}
+
+\newcommand{\FirstWay}{\noindent($\Rightarrow$). }
+\newcommand{\OtherWay}{\noindent($\Leftarrow$). }
 
 \newcommand{\nto}{\not\to}
 \DeclareMathOperator{\ide}{id}
@@ -565,8 +754,14 @@ $\bbold{#1}$%
 
 \newcommand{\ov}{\overline}
 \newcommand{\un}{\underline}
+\newcommand{\tl}{\tilde}
 
 \newcommand{\jacobi}[2]{\Par{\frac{#1}{#2}}}
+
+%% Physics %%
+
+\newcommand{\KE}{K\hspace{-0.6ex}E}
+\newcommand{\rA}{\text{\normalfont\AA}}
 
 %%% Pset templating %%%
 %% TODO: make this a class
@@ -734,6 +929,24 @@ $\bbold{#1}$%
         #1 & #2 & #3
     \end{vmatrix}
 }
+
+%%% OPTIONS %%%
+\newcommand{\checkfor}[2]{%
+    \ifcsname#1\endcsname%
+        #2%
+    \fi%
+}
+\DeclareOption{shortST}{%
+    \def\ST{\,\mathrm{s.t.}\,}
+}
+\DeclareOption{vec}{
+    \usevec
+}
+\DeclareOption{veca}{
+    \useveca
+}
+\ProcessOptions\relax
+%%% OPTIONS %%%
 
 \endinput
 %%

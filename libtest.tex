@@ -2,33 +2,27 @@
 
 \input{ling}
 \usepackage{texor}
-\input{math}
 
 \useHappyQED
+\usepackage{geometry}
+\smallmargins
 
 \begin{document}
 
-\psetSubject{00.000}
+\psetSubject{18.$\infty$}
 \psetSources{\TeXoR}
 \mkPsetTitle{}
 
+\abstract{%
+This document is a collection of tests related to the \TeXoR{} library of macros.
+}
+
 \newcommand{\alphabet}{Aa\,Bb\,Cc\,Dd\,Ee\,Ff\,Gg\,Hh\,Ii\,Jj\,Kk\,Ll\,Mm}
 \newcommand{\alphabett}{Nn\,Oo\,Pp\,Qq\,Rr\,Ss\,Tt\,Uu\,Vv\,Ww\,Xx\,Yy\,Zz}
-\newcommand{\numbers}{1\,2\,3\,4\,5\,6\,7\,8\,9\,0}
-\newcommand{\greek}
-    {A\al\,B\be\,\Ga\ga\,\De\de\,E\ep\,Z\ze\,H\eta\,\Te\te\,I\iota\,K\ka\,\lla\la\,M\mu}
-\newcommand{\greekk}
-    {N\nu\,\Xi\xi\,Oo\,\Pi\pi\,P\rho\,\Si\si\vsi\,T\tau\,Y\ups\,\Ph\phi\ph\,X\chi\,\Ps\ps\,\Om\om}
 
-\begin{itemize}
-    \item Vect: $\vv$ $\vk$ $\vzero$ $\vect1$ $\vV\ve\vc\vt\vo\vr$
-    \item Lie: $\Lg$ $\Ls\Lu\Par{3}$ $\LL\Li\Le$
-    \item Cal: $\CC$ $\CD$ $\CP$ $\CC\CA\CT\CE\CG\CO\CR\CY$
-    \item Fld: $\fA$ $\fF$ $\fK$ $\fF\fI\fE\fL\fD$
-    \item Num: $\N$ $\Z$ $\Q$ $\R$ $\C$
-    \item Grk: $\al$ $\ga$ $\Ga$ $\Om$ $\la$ $\ze$ $\ga\rho\ep\ep\ka$
-    \item Cat: $\cSet$ $\cTop$ $\cGrp$ $\cCat$
-\end{itemize}
+\[ \qedsymbol \]
+
+\section*{Delimiters}
 
 \newcommand{\deltest}[1]{%
 #1 
@@ -37,111 +31,360 @@
 & $x_{\call{#1}{y}}^{z^{\call{#1}{w}}}$
 & $\displaystyle{\call{#1}{\sum_{\call{#1}{x}} \Cx}}$ 
 & $\displaystyle{\call{#1}{\prod}}$
+& $\displaystyle{\call{#1}{\od{f}{\vx}}}$
 & $\call{#1}{\begin{array}{c}x\\y\end{array}}$ \\[6ex]
 }
+\newcommand{\deltestt}[1]{%
+#1 
+& $\call{#1}{x}{x}$ 
+& $\call{#1}{x^y}{x\in A}$
+& $x_{\call{#1}{y}{y}}^{z^{\call{#1}{w}{w}}}$
+& $\displaystyle{\call{#1}{\sum_{\call{#1}{x}{y}} \Cx}{\Cx\in\lla\Par{M}}}$ 
+& $\displaystyle{\call{#1}{\bigwedge\Lg}{\Lg\in\cLie}}$
+& $\call{#1}{\begin{array}{c}x\\y\end{array}}{x,y\in\R}$ 
+\\[6ex]
+}
 
-Delimiters:
 \begin{center}
-\begin{tabular}{r|cccccc}
+\begin{tabular}{r|ccccccc}
     \deltest{Par} 
     %\deltest{Paar}
     \deltest{Squ}
-    %\deltest{Sqqu}
+    \deltest{Sqqu}
     \deltest{Cur}
     %\deltest{Cuur}
     \deltest{Abs}
     \deltest{Nor}
-\end{tabular}
-\begin{tabular}{r|cccccc}
-    \deltest{Ang}
     %\deltest{Anng}
     \deltest{SPar}
     %\deltest{SPaar}
     \deltest{PSqu}
+\end{tabular}
+\begin{tabular}{r|ccccccc}
+    \deltest{Ang}
     %\deltest{PSqqu}
     \deltest{Ceil}
     \deltest{Flo}
     \deltest{Bra}
     \deltest{Ket}
+    \deltest{restr}
+\end{tabular}
+\begin{tabular}{r|ccccccc}
+    \deltestt{mkset}
+    \deltestt{BraKet}
 \end{tabular}
 \end{center}
 
-\[ \mathbb{123456789} \]
-\[ \mathbb{mathbb\,field} \]
-\[ \R \OR \Q \]
+\section{Alphabets}
 
-\begin{thm}
-    Let $\overset{*}{\vii}=\ii\vi$. Then,
-    \[\ov{\vii} = \hat{\vjj}\]    
-\end{thm}
+\newcommand{\alphtest}[1]{
+%\begin{center}
+%\begin{tabular}{ccccccccccc}
+    \vphantom{$\displaystyle\prod$}%
+    $\call{#1}{A}$&
+    $\call{#1}{B}$&
+    $\call{#1}{C}$&
+    $\call{#1}{D}$&
+    $\call{#1}{E}$&
+    $\call{#1}{F}$&
+    $\call{#1}{G}$&
+    $\call{#1}{H}$&
+    $\call{#1}{I}$&
+    $\call{#1}{J}$&
+    $\call{#1}{K}$&
+    $\call{#1}{L}$&
+    $\call{#1}{M}$\\  \hline
+    \vphantom{$\displaystyle\prod$}%
+    $\call{#1}{a}$&
+    $\call{#1}{b}$&
+    $\call{#1}{c}$&
+    $\call{#1}{d}$&
+    $\call{#1}{e}$&
+    $\call{#1}{f}$&
+    $\call{#1}{g}$&
+    $\call{#1}{h}$&
+    $\call{#1}{i}$&
+    $\call{#1}{j}$&
+    $\call{#1}{k}$&
+    $\call{#1}{l}$&
+    $\call{#1}{m}$\\ \hline
+    \vphantom{$\displaystyle\prod$}%
+    $\call{#1}{N}$&
+    $\call{#1}{O}$&
+    $\call{#1}{P}$&
+    $\call{#1}{Q}$&
+    $\call{#1}{R}$&
+    $\call{#1}{S}$&
+    $\call{#1}{T}$&
+    $\call{#1}{U}$&
+    $\call{#1}{V}$&
+    $\call{#1}{W}$&
+    $\call{#1}{X}$&
+    $\call{#1}{Y}$&
+    $\call{#1}{Z}$\\ \hline
+    \vphantom{$\displaystyle\prod$}%
+    $\call{#1}{n}$&
+    $\call{#1}{o}$&
+    $\call{#1}{p}$&
+    $\call{#1}{q}$&
+    $\call{#1}{r}$&
+    $\call{#1}{s}$&
+    $\call{#1}{t}$&
+    $\call{#1}{u}$&
+    $\call{#1}{v}$&
+    $\call{#1}{w}$&
+    $\call{#1}{x}$&
+    $\call{#1}{y}$&
+    $\call{#1}{z}$\\ \hline
+    \vphantom{$\displaystyle\prod$}%
+    $\call{#1}{1}$&
+    $\call{#1}{2}$&
+    $\call{#1}{3}$&
+    $\call{#1}{4}$&
+    $\call{#1}{5}$&
+    $\call{#1}{6}$&
+    $\call{#1}{7}$&
+    $\call{#1}{8}$&
+    $\call{#1}{9}$&
+    $\call{#1}{0}$&&&\\%
+}
+\newcommand{\grktest}[1]{%
+    \hline
+    \vphantom{$\displaystyle\prod$}%
+    $\call{#1}{\al}$&
+    $\call{#1}{\be}$&
+    $\call{#1}{\ga}$&
+    $\call{#1}{\de}$&
+    $\call{#1}{\ep}$&
+    $\call{#1}{\ze}$&
+    $\call{#1}{\eta}$&
+    $\call{#1}{\te}$&
+    $\call{#1}{\iota}$&
+    $\call{#1}{\ka}$&
+    $\call{#1}{\la}$&
+    $\call{#1}{\mu}$&
+    $\call{#1}{\nu}$\\ \hline
+    \vphantom{$\displaystyle\prod$}%
+    &
+    &
+    &
+    &
+    $\call{#1}{\vep}$&
+    &
+    &
+    $\call{#1}{\vte}$&
+    &
+    $\call{#1}{\vka}$&
+    &
+    &\\ \hline
+    \vphantom{$\displaystyle\prod$}%
+    $\call{#1}{\xi}$&
+    $\call{#1}{\pi}$&
+    $\call{#1}{\rho}$&
+    $\call{#1}{\si}$&
+    $\call{#1}{\tau}$&
+    $\call{#1}{\ups}$&
+    $\call{#1}{\ph}$&
+    $\call{#1}{\chi}$&
+    $\call{#1}{\ps}$&
+    $\call{#1}{\om}$&&&\\ \hline
+    \vphantom{$\displaystyle\prod$}%
+    &
+    $\call{#1}{\vpi}$&
+    $\call{#1}{\vrho}$&
+    &
+    &
+    &
+    $\call{#1}{\phi}$&
+    &
+    &
+    &&&\\ \hline
+    \vphantom{$\displaystyle\prod$}%
+    &
+    &
+    $\call{#1}{\Ga}$&
+    $\call{#1}{\De}$&
+    &
+    &
+    &
+    $\call{#1}{\Te}$&
+    &
+    &
+    $\call{#1}{\lla}$&
+    &
+    \\ \hline
+    \vphantom{$\displaystyle\prod$}%
+    &
+    &
+    $\call{#1}{\vGa}$&
+    $\call{#1}{\vDe}$&
+    &
+    &
+    &
+    $\call{#1}{\vTe}$&
+    &
+    &
+    $\call{#1}{\vlla}$&
+    &
+    \\ \hline
+    \vphantom{$\displaystyle\prod$}%
+    $\call{#1}{\Xi}$&
+    $\call{#1}{\Pi}$&
+    &
+    $\call{#1}{\Si}$&
+    &
+    &
+    $\call{#1}{\Ph}$&
+    &
+    $\call{#1}{\Ps}$&
+    $\call{#1}{\Om}$&&&\\ \hline
+    \vphantom{$\displaystyle\prod$}%
+    $\call{#1}{\vXi}$&
+    $\call{#1}{\vPi}$&
+    &
+    $\call{#1}{\vSi}$&
+    &
+    &
+    $\call{#1}{\vPh}$&
+    &
+    $\call{#1}{\vPs}$&
+    $\call{#1}{\vOm}$&&&
+%\end{tabular}    
+%\end{center}
+}
 
-\[ \StrGobbleLeft{foo}{1} \]
+\newcommand{\alphtb}[1]{%
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|c}
+\alphtest{#1}
+\end{tabular}
+\end{center}
+}
 
-\[ \hat{\vii} \vjj \]
+\newcommand{\alphgrktb}[1]{%
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|c}
+\alphtest{#1}
+\grktest{#1}
+\end{tabular}
+\end{center}
+}
 
-\[ A \srj B \inj C \]
+\subsection*{Roman}
+\alphgrktb{mathrm}
 
-\noindent
-$\greek$ \\
-$\greekk$ \\ \\
-$\fld{\alphabet}$ \\
-$\fld{\alphabett}$ \\
-$\fld{\numbers}$ \\
-$\fld{\greek}$ \\
-$\fld{\greekk}$ \\ \\
-$\cat{\alphabet}$ \\
-$\cat{\alphabett}$ \\
-$\cat{\numbers}$ \\ \\
-$\lie{\alphabet}$ \\
-$\lie{\alphabett}$ \\
-$\lie{\numbers}$ \\ \\
-$\vect{\alphabet}$ \\
-$\vect{\alphabett}$ \\
-$\vect{\numbers}$ \\ 
-$\vect{\greek}$ \\
-$\vect{\greekk}$ \\ \\
-$\ivect{\alphabet}$ \\
-$\ivect{\alphabett}$ \\
-$\ivect{\numbers}$ \\
-$\ivect{\greek}$ \\
-$\ivect{\greekk}$ \\
+\subsection*{Bold}
+\alphgrktb{vect}
 
-\begin{eqnarray*}
-    f &\in& \cnt^\om \\
-    g &\in& \cnt^\infty \\
-    h &\in& \cnt^0 \\
-    p &\in& \rie \\ 
-    q &\in& \lbe
-\end{eqnarray*}
+\subsection*{Harpoon}
+%\alphgrktb{vec}
+
+\subsection*{Bold Harpoon}
+\alphgrktb{}%{veca}
+
+\subsection*{Hat}
+\alphgrktb{hatt}
+
+\subsection*{Italic}
+\alphgrktb{}
+
+\subsection*{Italic Bold}
+%\alphtb{ivect}
+
+\subsection*{Italic Hat}
+%\alphtb{ihatt}
+
+\subsection*{Blackboard Bold}
+\alphtb{fld}
+
+\subsection*{Caligraphy}
+\alphtb{cat}
+
+\subsection*{Fraktur}
+\alphtb{lie}
+
+\section*{Big Ops}
+
+\newcommand{\bigoptest}[1]{#1 & $\scriptscriptstyle{\call{#1}_{i=0}^\infty f\Par{x}}$ & $\scriptstyle{\call{#1}_{i=0}^\infty f\Par{x}}$ & $\call{#1}_{i=0}^\infty f\Par{x}$ & $\displaystyle{\call{#1}_{i=0}^\infty f\Par{x}}$\\}
 
 \begin{center}
-    \tp{a} \into \tp{\ae} / \blank p
+\begin{tabular}{r|ccccc}
+    & script$^2$ & script & normal & display \\ \hline
+    \bigoptest{sum}
+    \bigoptest{prod}
+    \bigoptest{coprod}
+    \bigoptest{bigoplus}
+    \bigoptest{bigotimes}
+    \bigoptest{bigvee}
+    \bigoptest{bigwedge}
+    \bigoptest{bigcup}
+    \bigoptest{bigcap}
+    \bigoptest{bigstar}
+    \bigoptest{bigast}
+    \bigoptest{bigsmash}
+    \bigoptest{bighash}
+    \bigoptest{bigplus}
+    \bigoptest{bigtimes}
+\end{tabular}
 \end{center}
 
-\begin{thm}
-    A tautology is a tautology.    
-\end{thm}
+\section*{Theorems}
 
-\begin{thm*}
-    A tautology isn't a tautology.    
-\end{thm*}
-\begin{proof}
-    Actually, not true:
-    \[
-        X \neq \bigcup \CU_\la
-    \]
-\end{proof}
+\newcommand{\testthm}[3][]{
+    \subsection{#2}
+    \begin{S#3}[#1]
+        For a magnetic field $\vB$, $\Dive\vB = 0$.
+    \end{S#3}
+    \begin{#3}
+        The wavefunction $\Ps$ of a system is given by
+        \[ i\hbar\pd{\Ps}{t} = \HH\Ps. \]
+    \end{#3}
+    \begin{#3*}
+        \[ 1 + 2 + 3 + \cdots = -\frac{1}{12}. \]
+    \end{#3*}
+}
+\newcommand{\testprf}[1]{
+    \begin{#1}
+        Let $V\subS U$.
+    
+        \FirstWay Let $V$ be open in $X$. Then, $U\cap V = V$ is open, and so
+        $V$ is open in $U$.
+        
+        \OtherWay Let $V$ be open in $U$. Then, $V = U\cap W$ for some open
+        $W$ in $X$. Because $U$ is open in $X$, $U\cap W$ is open. Hence $V$ is
+        open in $X$.
+    \end{#1}
+}
 
-\begin{exercise}
-    Prove $P = NP$
-\end{exercise}
-\begin{solution}
-    This is an open problem.
-\end{solution}
+\testthm[Foo]{Theorem}{thm}
+\testthm[Foo]{Proposition}{prop}
+\testthm[Foo]{Lemma}{lem}
+\testthm[Foo]{Corolary}{cor}
+
+\testthm[Foo]{Definition}{defn}
+\testthm[Foo]{Axiom}{axi}
+\testthm[Foo]{Conjecture}{conj}
+\testthm[Foo]{Example}{example}
+\testthm[Foo]{Exercise}{exercise}
+\testthm[Foo]{Problem}{prob}
+\testthm[Foo]{Fact}{fact}
+
+\testthm[Foo]{Note}{note}
+\testthm[Foo]{Remark}{rem}
+\testthm[Foo]{Notation}{notation}
+
+\subsection{Proofs}
+
+\resetQED
+
+\testprf{proof}
+\testprf{proof*}
+\testprf{solution}
+
+\section*{Misc}
 
 \usevec
 
-%\renewcommand{\vec}[1]{\overset{\rightharpoonup}{#1}}
 \begin{eqnarray*}
     \Dive\vE &=& \frac{\rho}{\ep_0} \\
     \Dive\vB &=& 0 \\
@@ -163,6 +406,10 @@ $\ivect{\greekk}$ \\
 
 \[ \iiiint x \D x\]
 
+\[ A\vA\lim^1 \]
+
+\[ A \smashtimes B \]
+
 \begin{thm*} {\em (Stokes.)}
     For a differential form $\om$ and a region $R$, 
     \[ \int_{\del R}\om = \int_R \D \om \]
@@ -177,7 +424,7 @@ $\ivect{\greekk}$ \\
         Yes, I will.
         \[ 
             \bthree{\La}{\Lb}{\Lc}{\Ld}{\Le}{\Lf}{\Lg}{\Lh}{\Li}
-            \pthree{\CA}{\CB}{\CC}{\CD}{\CE}{\CF}{\CG}{\CH}{\CI} 
+            \pthree{\CR}{\CS}{\CT}{\CU}{\CV}{\CW}{\CX}{\CY}{\CZ} 
         \]
     \end{proof}
 \end{psetProblem}
