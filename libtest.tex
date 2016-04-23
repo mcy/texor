@@ -320,11 +320,14 @@ This document is a collection of tests related to the \TeXoR{} library of macros
     \bigoptest{bigcup}
     \bigoptest{bigcap}
     \bigoptest{bigstar}
+    \bigoptest{bigfatstar}
     \bigoptest{bigast}
     \bigoptest{bigsmash}
     \bigoptest{bighash}
+    \bigoptest{bigat}
     \bigoptest{bigplus}
     \bigoptest{bigtimes}
+    \bigoptest{bigdiv}
 \end{tabular}
 \end{center}
 
@@ -408,7 +411,9 @@ This document is a collection of tests related to the \TeXoR{} library of macros
 
 \[ A\vA\lim^1 \]
 
-\[ A \smashtimes B \]
+\[ \vA \times \vB,\quad \vA \smashtimes \vB,\quad \vA \hash \vB \]
+\[ \vA \star \vB,\quad \vA \fatstar \vB,\quad \vA \at \vB \]
+\[ \vA \prd \vB,\quad \vA \coprd \vB,\quad \vA \amalg \vB \]
 
 \begin{thm*} {\em (Stokes.)}
     For a differential form $\om$ and a region $R$, 
@@ -429,5 +434,6 @@ This document is a collection of tests related to the \TeXoR{} library of macros
     \end{proof}
 \end{psetProblem}
 
+\[ A \in \cMod[R][S], B \in \crMod[T] \quad V \in \cRep[G], \quad W \in \cVect[\R] \]
 
 \end{document}

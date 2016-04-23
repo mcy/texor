@@ -32,6 +32,10 @@
 \RequirePackage{accents}
 \RequirePackage{tikz}
 \RequirePackage{tikz-cd}
+\RequirePackage{enumitem}
+\RequirePackage{siunitx}
+\RequirePackage{cancel}
+%\RequirePackage{gensymb}
 %%% IMPORTS %%%
 
 %%% FONT STUFF %%%
@@ -71,6 +75,9 @@
   {\mathop{#3}\limits^{
     \vbox to#1{\kern-2\ex@
     \hbox{$#2$}\vss}}}}
+    
+\let\esi\si
+\let\si\relax
 
 %%% Theorems %%%
 
@@ -83,10 +90,10 @@
     \newtheorem*{#1*}{#2}
 }
 
-\def\deqsymbol{\smashtimes}
+\def\deqsymbol{$\smashtimes$}
 \newenvironment{proof*}[1][Proof]
     {\begin{proof}[#1]\def\qedsymbol{\deqsymbol}}
-    {\end{proof}\def\deqsymbol{\smashtimes}}
+    {\end{proof}\def\deqsymbol{$\smashtimes$}}
 
 \newcommand{\mkprf@}[3][]{%
     \newenvironment{#2}
@@ -122,7 +129,23 @@
 \mkthm@{notation}{Notation}
   
 \mkprf@{solution}{Solution}
-  
+
+\begin{comment}
+\newenvironment{casework}
+{%
+    \begingroup%
+    \newcounter{casei}% 
+    \newcommand{\case}[1][]{%
+    \\ Case. %\stepcounter{casei}\\ \noindent Case \exists{#1}{#1}{\arabic{casei}.%
+    }%
+    \hfill \\%
+}
+{\endgroup}
+\end{comment}
+
+\newlist{casework}{enumerate}{10}
+\setlist[casework]{label=\emph{Case \arabic*.}, leftmargin=5em}
+
 % TODO: fix, probably with tikz
 \let\qed@symbol\qedsymbol
 \newcommand{\useHappyQED}{%
@@ -219,16 +242,16 @@ $\bbold{#1}$%
 %#1{\overset{\scriptscriptstyle\h@rpoon}{\vphantom{a}{#1}}}
 \newcommand{\idcommand}[1]{#1}
 \newcommand{\ivect}{\bm}
-\newcommand{\vect}{\mathbf}
+\newcommand{\vect}[1]{{\mathbf{#1}}}
 \newcommand{\ihatt}[1]{\hat{\bm{#1}}}
 \newcommand{\hatt}[1]{\mathbf{\hat{#1}}}
 \newcommand{\veca}[1]{\vec{\mathbf{#1}}}
 \newcommand{\cat}{\mathcal}
 \newcommand{\namedCat}{\mathbf}
-\newcommand{\newcat}[1]{\expandafter\newcommand\csname c#1\endcsname{\namedCat{#1}}}
 \newcommand{\fld}{\mathbb}
 \newcommand{\lie}{\mathfrak}
 \newcommand{\rmn}{\mathrm}
+\newcommand{\unit}[1]{\,\rmn{#1}}
 
 \newcommand{\usevec}{
     \renewcommand{\vect}{\vec}
@@ -324,16 +347,26 @@ $\bbold{#1}$%
 \newcommand{\vpi}{\varpi}
 
 \newcommand{\Ga}{\Gamma}
-\newcommand{\De}{\hstretch{0.9}{\Delta}}
-\newcommand{\lla}{\Lambda}
+\newcommand{\De}{{\mathchoice
+    {\hstretch{0.8}{\Delta}}
+    {\hstretch{0.8}{\Delta}}
+    {\hstretch{0.7}{\Delta}}
+    {\hstretch{0.7}{\Delta}}}}
 \newcommand{\Te}{\Theta}
+\newcommand{\lla}{\Lambda}
+\newcommand{\LLa}{\Lambda}
 \newcommand{\Si}{\Sigma}
 \newcommand{\Om}{\Omega}
 \newcommand{\Ph}{\Phi}
 \newcommand{\Ps}{\Psi}
+\newcommand{\Ups}{\Upsilon}
 
 \newcommand{\vGa}{\varGamma}
-\newcommand{\vDe}{\hstretch{0.9}{\varDelta}}
+\newcommand{\vDe}{{\mathchoice
+    {\hstretch{0.8}{\varDelta}}
+    {\hstretch{0.8}{\varDelta}}
+    {\hstretch{0.7}{\varDelta}}
+    {\hstretch{0.7}{\varDelta}}}}
 \newcommand{\vlla}{\varLambda}
 \newcommand{\vTe}{\varTheta}
 \newcommand{\vSi}{\varSigma}
@@ -344,7 +377,11 @@ $\bbold{#1}$%
 \newcommand{\vPi}{\varPi}
 
 \let\bignabla\nabla
-\def\nabla{\hstretch{0.9}{\bignabla}}
+\def\nabla{{\mathchoice
+    {\hstretch{0.8}{\bignabla}}
+    {\hstretch{0.8}{\bignabla}}
+    {\hstretch{0.7}{\bignabla}}
+    {\hstretch{0.7}{\bignabla}}}}
 \def\vnabla{\nabla}
 
 % Misc %
@@ -358,6 +395,7 @@ $\bbold{#1}$%
 \let\pilcrow\P
 
 % Number Systems %
+\newcommand{\F}{\fF} % finite field
 \newcommand{\N}{\fN} % natural numbers
 \newcommand{\Z}{\fZ} % integers
 \newcommand{\Q}{\fQ} % rational numbers
@@ -365,73 +403,137 @@ $\bbold{#1}$%
 \newcommand{\C}{\fC} % complex numbers
 \renewcommand{\P}{\fP} % PROJECTIVE SPACE!!!
 
-\newcommand{\newspgrp}[1]{
-    \expandafter\DeclareDocumentCommand\csname#1\endcsname{ O{} m }{\mathrm{GL}_{##1}\@exists{##2}{\!\Par{##2}}{}}
+\newcommand{\newspgrp}[2]{
+    \expandafter\DeclareDocumentCommand\csname#1\endcsname{ O{} m }{\mathrm{#2}_{##1}\@exists{##2}{\Par{##2}}{}}
 }
 
-\newspgrp{GL}
-\newspgrp{SL}
-\newspgrp{SO}
-\newspgrp{SU}
+\newspgrp{GL}{GL}
+\newspgrp{SL}{SL}
+\newspgrp{SO}{SO}
+\newspgrp{sO}{O}
+\newspgrp{SU}{SU}
+\newspgrp{sU}{U}
 
 % Categories %
-\newcommand{\cDel}{\hstretch{0.8}{\varDelta}}
 
-\newcat{Ab}     % abelian groups / homomorphisms
-\newcat{AbCat}  % Ab categories / additive functors
-\newcat{Alg}    % algebras / homomorphisms
-\newcat{Ban}    % Banach spaces / linear maps of norm leq 1
-\newcat{CAlg}   % commutative algebras / homomorphisms
-\newcat{Cat}    % categories / functors
-\newcat{CAT}    % large categories / functors
-\newcat{Cls}    % classes / functions
-\newcat{CMet}   % complete metric spaces / metric-preserving functions
-\newcat{Cone}   % cones
-\newcat{CRing}  % commutative rings / homomorphisms
-\newcat{CRng}   % " / "
-\newcat{DGMod}  % differential graded modules
-\newcat{Dom}    % integral domains / homomorphisms
-\newcat{End}    % endofunctors / natural transformations
-\newcat{Ens}    % ensambles / functions
-\newcat{Fin}    % finite sets / functions
-\newcat{Finord} % finite ordinals / order-preserving functions
-\newcat{Fld}    % fields / homomorphisms
-\newcat{Funct}  % functors / natural transformations
-\newcat{GMod}   % graded modules / linear maps
-\newcat{Grp}    % groups / homomorphisms
-\newcat{Gpd}    % groupoids / homomorphisms
-\newcat{Grph}   % graphs / morphisms of graphs
-\newcat{Lie}    % lie groups...?
-\newcat{Map}    % not actually a category
-\newcat{Matr}   % natural numbers / matrices
-\newcat{Met}    % metric spaces / metric-preserving maps
-\newcat{Mod}    % modules / linear maps
-\newcat{Mon}    % monoids / homomorphisms
-\newcat{Moncat} % monoidal categories / monoidal functors
-\newcat{Mor}    % ...?
-\newcat{Nat}    % natural transformations
-\newcat{Open}   % open subsets / inclusions
-\newcat{Ord}    % ordered sets / order-preserving maps
-\newcat{Rel}    % relations / relation-preserving maps
-\newcat{Ring}   % rings / homomorphisms
-\newcat{Rng}    % " / "
-\newcat{Set}    % sets / functions
-\newcat{Top}    % topological spaces / continuous maps
-\newcat{Toph}   % topological spaces / homotopy classes
-\newcat{Vct}    % vector spaces / linear maps
-\newcat{Vect}   % " / "
+\newcommand{\newcat}[2][c]{
+    \expandafter\newcommand\csname #1#2\endcsname{
+        {\namedCat{#2}}
+    }
+}
+\newcommand{\newlcat}[2][cl]{
+    \expandafter\newcommand\csname #1#2\endcsname[1][]{
+        {\@exists{##1}{##1\text{-}}{}\namedCat{#2}}
+    }
+}
+\newcommand{\newrcat}[2][cr]{
+    \expandafter\newcommand\csname #1#2\endcsname[1][]{
+        {\namedCat{#2}\@exists{##1}{\text{-}##1}{}}
+    }
+}
+\newcommand{\newlrcat}[2][clr]{
+    \expandafter\DeclareDocumentCommand\csname #1#2\endcsname{ O{} O{} }{
+        {\@exists{##1}{##1\text{-}}{}\namedCat{#2}\@exists{##2}{\text{-}##2}{}}
+    }
+}
+\newcommand{\newvcat}[2][cv]{
+    \expandafter\newcommand\csname #1#2\endcsname[1][]{
+        {\namedCat{#2}_{##1}}
+    }
+}
+\newcommand{\newvlcat}[2][cvl]{
+    \expandafter\DeclareDocumentCommand\csname #1#2\endcsname{ O{} O{} }{
+        {\@exists{##1}{##1\text{-}}{}\namedCat{#2}_{##2}}
+    }
+}
+\newcommand{\newpcat}[2][cp]{
+    \expandafter\newcommand\csname #1#2\endcsname[1][]{
+        {\namedCat{#2}\Par{##1}}
+    }
+}
+
+% Cats: Sets
+\newcat{Set}        % sets / functions
+\newcat{Cls}        % classes / functions
+\newcat{Ens}        % ensambles / functions
+\newcat{Fin}        % finite sets / functions
+\newcat{Finord}     % finite ordinals / order-preserving functions
+\newcat{Ord}        % ordered sets / order-preserving maps
+\newcat{Rel}        % relations / relation-preserving maps
+
+% Cats: Grps %
+\newcat{Mon}        % monoids / homomorphisms
+\newcat{Grp}        % groups / homomorphisms
+\newcat{Ab}         % abelian groups / homomorphisms
+\newcat{Rig}        % rigs / homomorphisms
+\newcat{Rng}        % rngs / homomorphisms
+\newcat{Ring}       % rings / homomorphisms
+\newcat{CRng}       % commutative rngs / homomorphisms
+\newcat{CRing}      % commutative rings / homomorphisms
+\newcat{Dom}        % integral domains / homomorphisms
+\newcat{Fld}        % fields / homomorphisms
+
+\newlrcat[c]{Mod}   % two-sided modules / linear maps
+\newrcat{Mod}       % right modules / linear maps
+\newlrcat[c]{GMod}  % graded modules / linear maps
+\newlrcat[c]{DGMod} % differential graded modules
+\newvcat[c]{Alg}    % algebras / homomorphisms
+\newvcat[c]{CAlg}   % commutative algebras / homomorphisms
+\newvcat[c]{Rep}    % representations / intertwiners
+\newvlcat[cv]{Rep}  % " / " (w/ subscript)
+\newvcat[c]{Vct}    % vector spaces / linear maps
+\newvcat[c]{Vect}   % " / "
+
+% Cats: Calc %
+\newcat{Met}        % metric spaces / metric-preserving maps
+\newcat{CMet}       % complete metric spaces / metric-preserving functions
+\newcat{Hil}        % Hilbert spaces
+\newcat{Ban}        % Banach spaces
+\newcat{Lie}        % Lie groups/algebras
+\newcat{Man}        % manifolds
+\newcat{DMan}       % differentiable manifolds
+\newcat{SMan}       % smooth manifolds
+
+% Cats: Cats %
+\newcat{Grph}       % graphs / morphisms of graphs
+\newcat{Quiv}       % quivers / morphisms of quivers
+\newrcat[c]{Cat}    % categories / functors
+\newcat{AbCat}      % Ab categories / additive functors
+\newcat{CAT}        % large categories / functors
+\newcat{Gpd}        % groupoids / homomorphisms
+\newcat{Moncat}     % monoidal categories / monoidal functors
+
+\newcat{Map}        % not actually a category
+\newcat{Mor}        % ...?
+\newcat{Funct}      % functors / natural transformations
+\newcat{End}        % endofunctors / natural transformations
+\newcat{Nat}        % natural transformations
+\newcat{Cone}       % cones
+
+% Cats: Tops $
+\newcat{Top}        % topological spaces / continuous maps
+\newcat{Toph}       % topological spaces / maps modulo homotopy
+\newcat{Htpy}       % " / "
+\newpcat[cp]{Open}  % open subsets / inclusions
+
+% Cats: Misc %
+\newvcat[c]{Matr}   % natural numbers / matrices
+\newcommand{\ecat}{\cancel{\cat{O}}} % empty category
+\newcommand{\cDel}{\hstretch{0.8}{\varDelta}} % simplex category
+
+
 
 %%% Delimiters %%%
 
-\newcommand{\LeftRight}[5]{
+\newcommand{\LeftRight}[5]{{
     \scalerel[2ex]{#3}{\vphantom{\left#1#4\right.}}
     #4
     \scalerel[2ex]{#5}{\vphantom{\left#2#4\right.}}
-}
+}}
 
 \DeclareDocumentCommand{\newdelim}{ O{} O{} m m m }{%
     \expandafter\newcommand\csname #3\endcsname[1]{%
-        \left#4#1##1#2\right#5
+        {\left#4#1##1#2\right#5}
     }
 }
 % \newDelim[linner][rinner][lmodel][rmodel]{name}{ldelim}{rdelim}
@@ -469,8 +571,8 @@ $\bbold{#1}$%
     {\hspace{-0.4pt}\mathchoice{\bigg]}{\big]}{]}{]}
         \spacechoice{-4pt}{-3.1pt}{-1.3pt}{-1.2pt}\mathchoice{\bigg]}{\big]}{]}{]}}
 
-\newdelim[\spacechoice{2.2pt}{1pt}{0.8pt}{0.5pt}]
-    [\spacechoice{2.2pt}{1pt}{0.8pt}{0.5pt}]
+\newdelim%[\spacechoice{2.2pt}{1pt}{0.8pt}{0.5pt}]
+    %[\spacechoice{2.2pt}{1pt}{0.8pt}{0.5pt}]
     {Squ}{\lbrack}{\rbrack}
 \newDelim{Sqqu}{\llbrack}{\rrbrack}
 
@@ -529,6 +631,9 @@ $\bbold{#1}$%
 % f|
 \newdelim{restr}{.}{|}
 
+% f/g
+\newcommand{\Quot}[2]{\left.#1\middle/#2\right.}
+
 % <|
 \newdelim{Bra}{\langle}{|}
 
@@ -539,6 +644,7 @@ $\bbold{#1}$%
 
 % |>
 \newdelim{Ket}{|}{\rangle}
+\newcommand{\Keet}[2]{\Ket{#1\,;#2}}
 
 \newDelim[\spacechoice{1.6pt}{0.8pt}{0.8pt}{-0.5pt}][]%
     {@Ket}%
@@ -567,10 +673,10 @@ $\bbold{#1}$%
 \newcommand{\newbigop}[2]{%
     \expandafter\DeclareRobustCommand\csname#1\endcsname{%
         
-        \mathop{\vphantom{\sum}\expandafter\mathpalette\csname#1@\endcsname\relax}\slimits@
+        \mathop{\vphantom{\sum}\expandafter\mathpalette\csname#1@bigop\endcsname\relax}\slimits@
     }
 
-    \expandafter\newcommand\csname#1@\endcsname[2]{%
+    \expandafter\newcommand\csname#1@bigop\endcsname[2]{%
         \vcenter{%
             \sbox\z@{$##1\sum$}%
             \hbox{\resizebox{.9\dimexpr\ht\z@+\dp\z@}{!}{$\ThisStyle{##1}\m@th#2$}}%
@@ -578,10 +684,13 @@ $\bbold{#1}$%
     }
 }
 
+\let\f@tstar\bigstar
+\def\fatstar{\mathbin{\scalerel*{\f@tstar}{\ThisStyle{}\times}}}
 %\let\@star\bigstar
 %\def\star{\scriptstyle{\@star}}
 \newbigop{bigstar}{\star}
 \newbigop{bigast}{\ast}
+\newbigop{bigfatstar}{\fatstar}
 
 \newcommand{\smash@display}{%
 \begin{tikzpicture}[rotate=45,x=0.5ex,y=0.5ex]
@@ -598,7 +707,20 @@ $\bbold{#1}$%
 
 \newbigop{bigsmash}{\mathchoice{\smash@display}{\smash@other}{\smash@other}{\smash@other}}
 
+\newcommand{\hash}{\mathbin{\#}}
 \newbigop{bighash}{\#}
+
+\newcommand{\at}{\mathbin{\text{@}}}
+\newbigop{bigat}{\text{@}}
+
+\newbigop{bigdiv}{\div}
+
+%\let\prod@old\prod
+%\newbigop{prod}{\mathchoice{\textstyle{\prod@old}}{\prod@old}{\prod@old}{\prod@old}}
+
+%\let\coprod@old\coprod
+%\newbigop{coprod}{\mathchoice{\textstyle{\coprod@old}}{\coprod@old}{\coprod@old}
+%{\coprod@old}}
 
 \newcommand{\plus@display}{%
 \begin{tikzpicture}%[rotate=45,x=0.5ex,y=0.5ex]
@@ -625,7 +747,13 @@ $\bbold{#1}$%
 \newbigop{bigplus}{\mathchoice{\plus@display}{\plus@other}{\plus@other}{\plus@other}}
 %\newbigop{bigtimes}{\mathchoice{\times@display}{\times@other}{\times@other}{\times@other}}
 
-%% Linear Alg %%
+\DeclareMathOperator{\arccsc}{arccsc}
+\DeclareMathOperator{\arcsec}{arcsec}
+\DeclareMathOperator{\arccot}{arccot}
+
+\def\optimes{\mathop{\otimes}}
+
+%% Algebra %%
 \DeclareMathOperator{\img}{im}
 \DeclareMathOperator{\coker}{coker}
 \newcommand{\image}{\img} %% deprecated
@@ -635,19 +763,26 @@ $\bbold{#1}$%
 \newcommand{\cotran}{^\dagger}
 \newcommand{\opp}{^{\mathrm{op}}}
 \newcommand{\dual}{^*}
-\newcommand{\comp}{^c}
+\newcommand{\comp}{^{\mathrm{c}}}
 \DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\Res}{\vphantom{d}Res}
+\DeclareMathOperator{\Ind}{Ind}
+\DeclareMathOperator{\Ann}{Ann}
+\DeclareMathOperator{\Frac}{Frac}
+\DeclareMathOperator{\Char}{char}
 
 \newcommand{\powset}[1]{\CP\left(#1\right)} 
 
+\renewcommand{\mod}{\mathrel{\rmn{mod}}}
+
 % I'll be honest, I hate \Re and \Im
-\def\Re{\LR}%{\mathscr{R}}
-\def\Im{\LI}%{\mathscr{I}}
+\def\Re{\lie{R}}%{\mathscr{R}}
+\def\Im{\lie{I}}%{\mathscr{I}}
 
 %% Categories %%
 \DeclareMathOperator{\Hom}{\cat{hom}} % hom-set
-\DeclareMathOperator{\Endo}{end}      % endomorphism
-\DeclareMathOperator{\Aut}{aut}       % automorphism
+\DeclareMathOperator{\Endo}{End}      % endomorphism
+\DeclareMathOperator{\Aut}{Aut}       % automorphism
 \DeclareMathOperator{\Obj}{\cat{obj}} % category objects
 \DeclareMathOperator{\Mor}{\cat{mor}} % category morphisms
 \DeclareMathOperator{\Dom}{\cat{dom}} % domain
@@ -664,6 +799,8 @@ $\bbold{#1}$%
 \DeclareMathOperator{\Int}{Int} % interior
 \DeclareMathOperator{\Ext}{Ext} % exteriror
 \DeclareMathOperator{\Bd}{Bd}   % boundary
+\newcommand{\qsim}{{/{\sim}}}
+\newcommand{\op}[1]{#1^\circ}
  
 %% Analysis %% 
  
@@ -692,6 +829,10 @@ $\bbold{#1}$%
 \newcommand{\cnt}{\CC} % function ranks, e.g. \cnt^0 -> continuous functions
 \newcommand{\rie}{\LR} % riemann integrable funcs
 \newcommand{\lbe}{\CL} % lebesgue integrable funcs
+
+\let\@iint\varoiint
+\let\varoiint\oiint
+\let\oiint\@iint
  
 %% Vect Calc %%
 \DeclareMathOperator{\grad}{grad}
@@ -717,10 +858,13 @@ $\bbold{#1}$%
 
 %% Misc %%
 \renewcommand{\to}{\rightarrow}
+\newcommand{\To}{\Rightarrow}
 \newcommand{\toto}{\rightrightarrows}
 \newcommand{\from}{\leftarrow}
 \newcommand{\fromfrom}{\leftleftarrows}
 \newcommand{\fromto}{\leftrightarrow}
+\newcommand{\up}{\uparrow}
+\newcommand{\upup}{\upuparrows}
 \newcommand{\down}{\downarrow}
 \newcommand{\downdown}{\downdownarrows}
 \newcommand{\toself}{\circlearrowright}
@@ -741,14 +885,23 @@ $\bbold{#1}$%
 \newcommand{\lmap}[1]{\xleftarrow{#1}}
 
 \DeclareMathOperator{\lcd}{lcd} 
-\renewcommand{\mod}[1]{\left(\mathrm{mod}\,#1\right)}
+\DeclareMathOperator{\sech}{sech}
+\DeclareMathOperator{\csch}{csch}
+\DeclareMathOperator{\erf}{erf}
+%\renewcommand{\mod}[1]{\left(\mathrm{mod}\,#1\right)}
 
 \newcommand{\nin}{\notin}
-\newcommand{\subS}{\subseteq}
-\newcommand{\supS}{\supseteq}
+\newcommand{\subS}{\sbs}
+\newcommand{\supS}{\sps}
+\newcommand{\sbs}{\subset}
+\newcommand{\sps}{\supset}
+\newcommand{\sans}[1][]{\setminus\@exists{#1}{\Cur{#1}}{}}
+\newcommand{\sansz}{\sans[0]}
 
+\let\@cong\cong
 \newcommand{\ind}{\fld{1}}
 \newcommand{\isom}{\simeq}
+\newcommand{\homeo}{\@cong}
 \renewcommand{\cong}{\equiv}
 \newcommand{\isdef}{:=}
 
@@ -762,6 +915,28 @@ $\bbold{#1}$%
 
 \newcommand{\KE}{K\hspace{-0.6ex}E}
 \newcommand{\rA}{\text{\normalfont\AA}}
+
+\def\labar{\protect\@lambdabar}
+\def\@lambdabar{%
+\relax
+\bgroup
+\def\@tempa{\hbox{\raise.8\ht0
+\hbox to0pt{\kern.15\wd0\vrule width.65\wd0
+height.25pt depth.1pt\hss}\box0}}% 
+\mathchoice{\setbox0\hbox{$\displaystyle\lambda$}\@tempa}%
+{\setbox0\hbox{$\textstyle\lambda$}\@tempa}%
+{\setbox0\hbox{$\scriptstyle\lambda$}\@tempa}%
+{\setbox0\hbox{$\scriptscriptstyle\lambda$}\@tempa}%
+\egroup
+}
+
+\def\ham{{\hat{\CH}}}
+
+%% SI Inits %
+
+\sisetup{
+    inter-unit-product = \ensuremath{{}\cdot{}}
+}
 
 %%% Pset templating %%%
 %% TODO: make this a class
