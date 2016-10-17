@@ -10,6 +10,14 @@
 
 \let\h@rpoon\rightharpoonup
 
+%% Style Note %%
+% All internal commands should
+% be of the form \texor@section@name
+% where `Section` is the part of the 
+% package it's declared in, and `name`
+% is the actual command name.
+%% %% %%%% %% %%
+
 %%% IMPORTS %%%
 \RequirePackage{amsthm}
 \RequirePackage{verbatim}
@@ -35,7 +43,7 @@
 \RequirePackage{enumitem}
 \RequirePackage{siunitx}
 \RequirePackage{cancel}
-%\RequirePackage{gensymb}
+\RequirePackage{qtree}
 %%% IMPORTS %%%
 
 %%% FONT STUFF %%%
@@ -45,6 +53,63 @@
 \RequirePackage{xunicode}
 \newfontfamily\xitsbb{XITS Math}
 
+%% TIPA nonsense
+% so, tipa redefines a bunch of macros, because they don't
+% understand groups. thanks. luckily, tipa provides a reset command!
+
+\undef\sups
+\RequirePackage{tipa}
+
+% save the magic commands
+\let\texor@tipa@colon\:
+\let\texor@tipa@semi\;
+\let\texor@tipa@bang\!
+\let\texor@tipa@star\*
+\let\texor@tipa@pipe\|
+\let\texor@tipa@syl\s
+
+% reset them to LaTeX settings
+\tipasafemode
+
+% now we re-add them!
+
+\newcommand{\texor@tipa@pre}{%
+\let\:\texor@tipa@colon%
+\let\;\texor@tipa@semi%
+\let\!\texor@tipa@bang%
+\let\*\texor@tipa@star%
+\let\|\texor@tipa@pipe%
+\def\~##1{$\tilde{\text{\textipa{\@stripdot{##1}}}}$}%
+\def\^##1{$\hat{\text{\textipa{\@stripdot{##1}}}}$}%
+\def\v##1{$\check{\text{\textipa{\@stripdot{##1}}}}$}%
+\def\`##1{$\grave{\text{\textipa{\@stripdot{##1}}}}$}%
+\def\'##1{$\acute{\text{\textipa{\@stripdot{##1}}}}$}%
+\def\s##1{$\underset{\text{\textipa{"}}}{\text{\textipa{\texor@tipa@stripdot{##1}}}}$}%
+}
+
+\newcommand{\texor@tipa@stripdot}[1]{\ifx#1i\i\else\ifx#1j\j\else#1\fi\fi}
+
+\newcommand{\texor@tipa@internal}[2][r]{%
+\begingroup
+\fontfamily{cm#1}%
+\texor@tipa@pre%
+\tipaencoding{#2}%
+\endgroup}
+
+% redefine the TIPA commands
+\AtBeginDocument{
+    \renewcommand\textipa[2][r]{{\texor@tipa@internal[#1]{#2}}}
+}
+\renewenvironment{IPA}[1][r]{%
+\fontfamily{cm#1}%
+\texor@tipa@pre%
+\tipaencoding}{}
+%% End TIPA
+
+% everything beyond this point *must*
+% come after tipa, because tipa does
+% font voodoo
+
 \RequirePackage{bbold}
 \let\bbold\mathbb
 
@@ -53,29 +118,34 @@
 
 \usepackage{bm}
 \def\mathbf#1{\bm{\mathrm{#1}}}
-%%% FONT STUFF %%%
 
+%%% END FONT STUFF %%%
+
+%% this is for fun. really.
 \newcommand{\TeXoR}
     {\TeX \hspace{-0.875ex}{\raisebox{0.31ex}{o}}\hspace{-0.55ex}R}
 
-\def\@x@{}
-\newcommand{\@exists}[3]{\ifx\@x@#1\@x@ #3 \else #2 \fi}
+%% the \texor@exists{test}{then}{else} macro
+% takes a string, and if it is nontrivial, outputs 
+% `then`. otherwise, it outputs `else`.
+\def\texor@exists@dummy{}
+\newcommand{\texor@exists}[3]{\ifx\texor@exists@dummy#1\texor@exists@dummy #3\else #2\fi}
 
 %%% Preamble %%%
-\newcommand{\smallmargins}{\geometry{lmargin=1in,rmargin=1in}}
+\newcommand{\texor@call}[1]{\csname#1\endcsname}
 
-\newcommand{\resetmargins}{\geometry{lmargin=2in,rmargin=2in}}
-
-\newcommand{\call}[1]{\csname#1\endcsname}
-
+% I have no idea what this does
 \def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
 \let\endchangemargin=\endlist
 
+% or this... I think it stands for overset?
 \newcommand{\oset}[3][0ex]{%
   {\mathop{#3}\limits^{
     \vbox to#1{\kern-2\ex@
     \hbox{$#2$}\vss}}}}
-    
+
+%% this is for the SI package.
+% little sigma is more important.
 \let\esi\si
 \let\si\relax
 
@@ -83,74 +153,76 @@
 
 \let\defaultqed\qedsymbol
 
-% shorthand for theorem generation
-\newcommand{\mkthm@}[2]{%
+% generates theorem environments
+\newcommand{\texor@thm@gen}[2]{%
     \newtheorem{S#1}{#2}[section]
     \newtheorem{#1}{#2}
     \newtheorem*{#1*}{#2}
 }
 
+% the /contradiction/ environment!
 \def\deqsymbol{$\smashtimes$}
 \newenvironment{proof*}[1][Proof]
     {\begin{proof}[#1]\def\qedsymbol{\deqsymbol}}
     {\end{proof}\def\deqsymbol{$\smashtimes$}}
 
-\newcommand{\mkprf@}[3][]{%
+% generates proof environments
+\newcommand{\texor@thm@genproof}[3][]{%
     \newenvironment{#2}
-        {\begin{proof}[#3] \@exists{#1}{\def\qedsymbol{#1}}{}}
+        {\begin{proof}[#3] \texor@exists{#1}{\def\qedsymbol{#1}}{}}
         {\end{proof}}
 }
 
-\newcommand{\mkcontr@}[3][]{%
+% generates contradiction environments
+\newcommand{\texor@thm@gencontr}[3][]{%
     \newenvironment{#2}
-        {\begin{proof*}[#3] \@exists{#1}{\def\deqsymbol{#1}}{}}
+        {\begin{proof*}[#3] \texor@exists{#1}{\def\deqsymbol{#1}}{}}
         {\end{proof*}}
 }
 
-\mkthm@{thm}{Theorem}
-\mkthm@{lem}{Lemma}
-\mkthm@{prop}{Proposition}
-\mkthm@{cor}{Corollary}
+\theoremstyle{normal}
+
+\texor@thm@gen{thm}{Theorem}
+\texor@thm@gen{lem}{Lemma}
+\texor@thm@gen{prop}{Proposition}
+\texor@thm@gen{cor}{Corollary}
 
 \theoremstyle{definition}
 
-\mkthm@{defn}{Definition}
-\mkthm@{axi}{Axiom}
-\mkthm@{conj}{Conjecture}
-\mkthm@{example}{Example}
-\mkthm@{exercise}{Exercise}
-\mkthm@{prob}{Problem}
-\mkthm@{fact}{Fact}
+\texor@thm@gen{defn}{Definition}
+\texor@thm@gen{axi}{Axiom}
+\texor@thm@gen{conj}{Conjecture}
+\texor@thm@gen{example}{Example}
+\texor@thm@gen{exercise}{Exercise}
+\texor@thm@gen{prob}{Problem}
+\texor@thm@gen{fact}{Fact}
 
 \theoremstyle{remark}
 
-\mkthm@{rem}{Remark}
-\mkthm@{note}{Note}
-\mkthm@{notation}{Notation}
+\texor@thm@gen{rem}{Remark}
+\texor@thm@gen{note}{Note}
+\texor@thm@gen{notation}{Notation}
   
-\mkprf@{solution}{Solution}
+\texor@thm@genproof{solution}{Solution}
 
-\begin{comment}
-\newenvironment{casework}
-{%
-    \begingroup%
-    \newcounter{casei}% 
-    \newcommand{\case}[1][]{%
-    \\ Case. %\stepcounter{casei}\\ \noindent Case \exists{#1}{#1}{\arabic{casei}.%
-    }%
-    \hfill \\%
+%% the casework environment is secretly a list!
+\newlist{casework}{enumerate}{4}
+\setlist[casework]{
+    label*=\arabic*.,
+    leftmargin=!,
+    wide,
+    labelwidth=!, labelindent=0pt
 }
-{\endgroup}
-\end{comment}
+\setlist[casework,1]{
+    label={\emph{Case} \arabic*.}
+}
 
-\newlist{casework}{enumerate}{10}
-\setlist[casework]{label=\emph{Case \arabic*.}, leftmargin=5em}
-
-% TODO: fix, probably with tikz
-\let\qed@symbol\qedsymbol
-\newcommand{\useHappyQED}{%
-    \renewcommand{\qedsymbol}{:)}
-    \renewcommand{\deqsymbol}{:(}
+\newlist{probenum}{enumerate}{0}
+\setlist[probenum]{
+    label=(\alph*),
+    leftmargin=!,
+    wide,
+    labelwidth=!, labelindent=0pt
 }
 
 \newcommand{\resetQED}{%
@@ -158,64 +230,68 @@
     \renewcommand{\deqsymbol}{$\smashtimes$}
 }
 
+\newenvironment{probenum*}{\begin{prob}\begin{enumprob}}{\end{enumprob}\end{prob}}
+
 %%% Variables %%%
 
-\def\xhar{\xitsbb\char}
-\newcommand{\tobb}[1]{%
-\ifthenelse{\equal{#1}{a}}{\xhar"1D552}{%
-\ifthenelse{\equal{#1}{b}}{\xhar"1D553}{%
-\ifthenelse{\equal{#1}{c}}{\xhar"1D554}{%
-\ifthenelse{\equal{#1}{d}}{\xhar"1D555}{%
-\ifthenelse{\equal{#1}{e}}{\xhar"1D556}{%
-\ifthenelse{\equal{#1}{f}}{\xhar"1D557}{%
-\ifthenelse{\equal{#1}{g}}{\xhar"1D558}{%
-\ifthenelse{\equal{#1}{h}}{\xhar"1D559}{%
-\ifthenelse{\equal{#1}{i}}{\xhar"1D55A}{%
-\ifthenelse{\equal{#1}{j}}{\xhar"1D55B}{%
-\ifthenelse{\equal{#1}{k}}{\xhar"1D55C}{%
-\ifthenelse{\equal{#1}{l}}{\xhar"1D55D}{%
-\ifthenelse{\equal{#1}{m}}{\xhar"1D55E}{%
-\ifthenelse{\equal{#1}{n}}{\xhar"1D55F}{%
-\ifthenelse{\equal{#1}{o}}{\xhar"1D560}{%
-\ifthenelse{\equal{#1}{p}}{\xhar"1D561}{%
-\ifthenelse{\equal{#1}{q}}{\xhar"1D562}{%
-\ifthenelse{\equal{#1}{r}}{\xhar"1D563}{%
-\ifthenelse{\equal{#1}{s}}{\xhar"1D564}{%
-\ifthenelse{\equal{#1}{t}}{\xhar"1D565}{%
-\ifthenelse{\equal{#1}{u}}{\xhar"1D566}{%
-\ifthenelse{\equal{#1}{v}}{\xhar"1D567}{%
-\ifthenelse{\equal{#1}{w}}{\xhar"1D568}{%
-\ifthenelse{\equal{#1}{x}}{\xhar"1D569}{%
-\ifthenelse{\equal{#1}{y}}{\xhar"1D56A}{%
-\ifthenelse{\equal{#1}{z}}{\xhar"1D56B}{%
+%% General font magic %%
+
+% Switch for ascii -> unicode bb %
+\def\texor@fonts@xitschar{\xitsbb\char}
+\newcommand{\texor@fonts@toblackboard}[1]{%
+\ifthenelse{\equal{#1}{a}}{\texor@fonts@xitschar"1D552}{%
+\ifthenelse{\equal{#1}{b}}{\texor@fonts@xitschar"1D553}{%
+\ifthenelse{\equal{#1}{c}}{\texor@fonts@xitschar"1D554}{%
+\ifthenelse{\equal{#1}{d}}{\texor@fonts@xitschar"1D555}{%
+\ifthenelse{\equal{#1}{e}}{\texor@fonts@xitschar"1D556}{%
+\ifthenelse{\equal{#1}{f}}{\texor@fonts@xitschar"1D557}{%
+\ifthenelse{\equal{#1}{g}}{\texor@fonts@xitschar"1D558}{%
+\ifthenelse{\equal{#1}{h}}{\texor@fonts@xitschar"1D559}{%
+\ifthenelse{\equal{#1}{i}}{\texor@fonts@xitschar"1D55A}{%
+\ifthenelse{\equal{#1}{j}}{\texor@fonts@xitschar"1D55B}{%
+\ifthenelse{\equal{#1}{k}}{\texor@fonts@xitschar"1D55C}{%
+\ifthenelse{\equal{#1}{l}}{\texor@fonts@xitschar"1D55D}{%
+\ifthenelse{\equal{#1}{m}}{\texor@fonts@xitschar"1D55E}{%
+\ifthenelse{\equal{#1}{n}}{\texor@fonts@xitschar"1D55F}{%
+\ifthenelse{\equal{#1}{o}}{\texor@fonts@xitschar"1D560}{%
+\ifthenelse{\equal{#1}{p}}{\texor@fonts@xitschar"1D561}{%
+\ifthenelse{\equal{#1}{q}}{\texor@fonts@xitschar"1D562}{%
+\ifthenelse{\equal{#1}{r}}{\texor@fonts@xitschar"1D563}{%
+\ifthenelse{\equal{#1}{s}}{\texor@fonts@xitschar"1D564}{%
+\ifthenelse{\equal{#1}{t}}{\texor@fonts@xitschar"1D565}{%
+\ifthenelse{\equal{#1}{u}}{\texor@fonts@xitschar"1D566}{%
+\ifthenelse{\equal{#1}{v}}{\texor@fonts@xitschar"1D567}{%
+\ifthenelse{\equal{#1}{w}}{\texor@fonts@xitschar"1D568}{%
+\ifthenelse{\equal{#1}{x}}{\texor@fonts@xitschar"1D569}{%
+\ifthenelse{\equal{#1}{y}}{\texor@fonts@xitschar"1D56A}{%
+\ifthenelse{\equal{#1}{z}}{\texor@fonts@xitschar"1D56B}{%
 %
-\ifthenelse{\equal{#1}{0}}{\xhar"1D7D8}{%
-%\ifthenelse{\equal{#1}{1}}{\xhar"1D7D9}{%
-\ifthenelse{\equal{#1}{2}}{\xhar"1D7DA}{%
-\ifthenelse{\equal{#1}{3}}{\xhar"1D7DB}{%
-\ifthenelse{\equal{#1}{4}}{\xhar"1D7DC}{%
-\ifthenelse{\equal{#1}{5}}{\xhar"1D7DD}{%
-\ifthenelse{\equal{#1}{6}}{\xhar"1D7DE}{%
-%\ifthenelse{\equal{#1}{7}}{\xhar"1D7DF}{%
-\ifthenelse{\equal{#1}{8}}{\xhar"1D7E0}{%
-\ifthenelse{\equal{#1}{9}}{\xhar"1D7E1}{%
+\ifthenelse{\equal{#1}{0}}{\texor@fonts@xitschar"1D7D8}{%
+%\ifthenelse{\equal{#1}{1}}{\texor@fonts@xitschar"1D7D9}{%
+\ifthenelse{\equal{#1}{2}}{\texor@fonts@xitschar"1D7DA}{%
+\ifthenelse{\equal{#1}{3}}{\texor@fonts@xitschar"1D7DB}{%
+\ifthenelse{\equal{#1}{4}}{\texor@fonts@xitschar"1D7DC}{%
+\ifthenelse{\equal{#1}{5}}{\texor@fonts@xitschar"1D7DD}{%
+\ifthenelse{\equal{#1}{6}}{\texor@fonts@xitschar"1D7DE}{%
+%\ifthenelse{\equal{#1}{7}}{\texor@fonts@xitschar"1D7DF}{%
+\ifthenelse{\equal{#1}{8}}{\texor@fonts@xitschar"1D7E0}{%
+\ifthenelse{\equal{#1}{9}}{\texor@fonts@xitschar"1D7E1}{%
 %
-\ifthenelse{\equal{#1}{\pi}}{\xhar"0213C}{%
-\ifthenelse{\equal{#1}{\gamma}}{\xhar"0213D}{%
-\ifthenelse{\equal{#1}{\Gamma}}{\xhar"0213E}{%
-\ifthenelse{\equal{#1}{\Pi}}{\xhar"0213F}{%
+\ifthenelse{\equal{#1}{\pi}}{\texor@fonts@xitschar"0213C}{%
+\ifthenelse{\equal{#1}{\gamma}}{\texor@fonts@xitschar"0213D}{%
+\ifthenelse{\equal{#1}{\Gamma}}{\texor@fonts@xitschar"0213E}{%
+\ifthenelse{\equal{#1}{\Pi}}{\texor@fonts@xitschar"0213F}{%
 $\bbold{#1}$%
 }}}}%
 }}}}}}}}}}%
 }}}}}}}}}}}}}}}}}}}}}}}}%}%}%
 }
+% End Switch %
 
-\newcommand{\otherbb}[1]{\text{\tobb{#1}}}
-
-%\def\othercal#1{\vstretch{1.2}{\hstretch{1.2}{\pzccal{#1}}}}
+\newcommand{\otherbb}[1]{\text{\texor@fonts@toblackboard{#1}}}
 
 % Magic for mathbb/mathcal %
-\newcommand{\ifCap}[3]{{\ifthenelse{
+\newcommand{\texor@fonts@ifcapital}[3]{{\ifthenelse{
     \equal{#1}{A} \OR \equal{#1}{B} \OR \equal{#1}{C} \OR \equal{#1}{D} \OR
     \equal{#1}{E} \OR \equal{#1}{F} \OR \equal{#1}{G} \OR \equal{#1}{H} \OR
     \equal{#1}{I} \OR \equal{#1}{J} \OR \equal{#1}{K} \OR \equal{#1}{L} \OR
@@ -223,24 +299,18 @@ $\bbold{#1}$%
     \equal{#1}{Q} \OR \equal{#1}{R} \OR \equal{#1}{S} \OR \equal{#1}{T} \OR
     \equal{#1}{U} \OR \equal{#1}{V} \OR \equal{#1}{W} \OR \equal{#1}{X} \OR
     \equal{#1}{Y} \OR \equal{#1}{Z}
-}{\call{#2}{#1}}{\call{#3}{#1}}}}
+}{\texor@call{#2}{#1}}{\texor@call{#3}{#1}}}}
 
-\def\bbouter#1{\bbloop#1\relax}
-\def\bbloop#1{\ifx\relax#1\else\ifCap{#1}{amsbb}{otherbb}\expandafter\bbloop\fi}
-\def\mathbb#1{\expandafter\bbouter\expandafter{#1}}
+\def\texor@fonts@bb@outer#1{\texor@fonts@bb@loop#1\relax}
+\def\texor@fonts@bb@loop#1{\ifx\relax#1\else\texor@fonts@ifcapital{#1}{amsbb}{otherbb}\expandafter\texor@fonts@bb@loop\fi}
+\def\mathbb#1{\expandafter\texor@fonts@bb@outer\expandafter{#1}}
 
-\def\calouter#1{\calloop#1\relax}
-\def\calloop#1{\ifx\relax#1\else\ifCap{#1}{amscal}{othercal}\expandafter\calloop\fi}
-\def\mathcal#1{\expandafter\calouter\expandafter{#1}}
+\def\texor@fonts@cal@outer#1{\texor@fonts@cal@loop#1\relax}
+\def\texor@fonts@cal@loop#1{\ifx\relax#1\else\texor@fonts@ifcapital{#1}{amscal}{othercal}\expandafter\texor@fonts@cal@loop\fi}
+\def\mathcal#1{\expandafter\texor@fonts@cal@outer\expandafter{#1}}
 % End Magic %
 
-%% Formats %%
-%def\vec#1{\oset[-1.8pt]{\hstretch{0.7}{\mathbf{\scriptscriptstyle\h@rpoon}}}{#1}}
-%\usepackage{harpoon}
-%\newcommand*{\vec}[1]{\text{\overharp{\vstretch{0.4}{\scriptscriptstyle\h@rpoon}}{\ensuremath{#1}}{.7}}} 
-%\def\vec\rharp
-%#1{\overset{\scriptscriptstyle\h@rpoon}{\vphantom{a}{#1}}}
-\newcommand{\idcommand}[1]{#1}
+%% Variable formats %%
 \newcommand{\ivect}{\bm}
 \newcommand{\vect}[1]{{\mathbf{#1}}}
 \newcommand{\ihatt}[1]{\hat{\bm{#1}}}
@@ -251,8 +321,8 @@ $\bbold{#1}$%
 \newcommand{\fld}{\mathbb}
 \newcommand{\lie}{\mathfrak}
 \newcommand{\rmn}{\mathrm}
-\newcommand{\unit}[1]{\,\rmn{#1}}
 
+%% I don't think this actually works
 \newcommand{\usevec}{
     \renewcommand{\vect}{\vec}
     \renewcommand{\hatt}[1]{\hat{##1}}
@@ -269,39 +339,51 @@ $\bbold{#1}$%
     \def\vnabla{\nabla}
 }
 
-\def\mkletter@#1#2#3{%
+% \texor@fonts@letter{letter}{prefix}{command}
+% produces a single letter for an alphabet
+\def\texor@fonts@letter#1#2#3{%
     \expandafter\providecommand\csname#2#1\endcsname
         {\csname#3\endcsname{#1}}
 }
-% \@mkalph{prefix}{command}
-\def\mkalph@#1#2{%
-    \mkletter@{a}{#1}{#2} \mkletter@{j}{#1}{#2} \mkletter@{s}{#1}{#2}
-    \mkletter@{b}{#1}{#2} \mkletter@{k}{#1}{#2} \mkletter@{t}{#1}{#2}
-    \mkletter@{c}{#1}{#2} \mkletter@{l}{#1}{#2} \mkletter@{u}{#1}{#2}
-    \mkletter@{d}{#1}{#2} \mkletter@{m}{#1}{#2} \mkletter@{v}{#1}{#2}
-    \mkletter@{e}{#1}{#2} \mkletter@{n}{#1}{#2} \mkletter@{w}{#1}{#2}
-    \mkletter@{f}{#1}{#2} \mkletter@{o}{#1}{#2} \mkletter@{x}{#1}{#2}
-    \mkletter@{g}{#1}{#2} \mkletter@{p}{#1}{#2} \mkletter@{y}{#1}{#2}
-    \mkletter@{h}{#1}{#2} \mkletter@{q}{#1}{#2} \mkletter@{z}{#1}{#2}
-    \mkletter@{i}{#1}{#2} \mkletter@{r}{#1}{#2}
+
+% \texor@fonts@alphabet{prefix}{command}
+% produces an entire alphabet
+\def\texor@fonts@alphabet#1#2{
+    \texor@fonts@letter{a}{#1}{#2} \texor@fonts@letter{n}{#1}{#2}
+    \texor@fonts@letter{b}{#1}{#2} \texor@fonts@letter{o}{#1}{#2}
+    \texor@fonts@letter{c}{#1}{#2} \texor@fonts@letter{p}{#1}{#2}
+    \texor@fonts@letter{d}{#1}{#2} \texor@fonts@letter{q}{#1}{#2}
+    \texor@fonts@letter{e}{#1}{#2} \texor@fonts@letter{r}{#1}{#2}
+    \texor@fonts@letter{f}{#1}{#2} \texor@fonts@letter{s}{#1}{#2}
+    \texor@fonts@letter{g}{#1}{#2} \texor@fonts@letter{t}{#1}{#2}
+    \texor@fonts@letter{h}{#1}{#2} \texor@fonts@letter{u}{#1}{#2}
+    \texor@fonts@letter{i}{#1}{#2} \texor@fonts@letter{v}{#1}{#2}
+    \texor@fonts@letter{j}{#1}{#2} \texor@fonts@letter{w}{#1}{#2}
+    \texor@fonts@letter{k}{#1}{#2} \texor@fonts@letter{x}{#1}{#2}
+    \texor@fonts@letter{l}{#1}{#2} \texor@fonts@letter{y}{#1}{#2}
+    \texor@fonts@letter{m}{#1}{#2} \texor@fonts@letter{z}{#1}{#2}
     
-    \mkletter@{A}{#1}{#2} \mkletter@{J}{#1}{#2} \mkletter@{S}{#1}{#2}
-    \mkletter@{B}{#1}{#2} \mkletter@{K}{#1}{#2} \mkletter@{T}{#1}{#2}
-    \mkletter@{C}{#1}{#2} \mkletter@{L}{#1}{#2} \mkletter@{U}{#1}{#2}
-    \mkletter@{D}{#1}{#2} \mkletter@{M}{#1}{#2} \mkletter@{V}{#1}{#2}
-    \mkletter@{E}{#1}{#2} \mkletter@{N}{#1}{#2} \mkletter@{W}{#1}{#2}
-    \mkletter@{F}{#1}{#2} \mkletter@{O}{#1}{#2} \mkletter@{X}{#1}{#2}
-    \mkletter@{G}{#1}{#2} \mkletter@{P}{#1}{#2} \mkletter@{Y}{#1}{#2}
-    \mkletter@{H}{#1}{#2} \mkletter@{Q}{#1}{#2} \mkletter@{Z}{#1}{#2}
-    \mkletter@{I}{#1}{#2} \mkletter@{R}{#1}{#2}
+    \texor@fonts@letter{A}{#1}{#2} \texor@fonts@letter{N}{#1}{#2}
+    \texor@fonts@letter{B}{#1}{#2} \texor@fonts@letter{O}{#1}{#2}
+    \texor@fonts@letter{C}{#1}{#2} \texor@fonts@letter{P}{#1}{#2}
+    \texor@fonts@letter{D}{#1}{#2} \texor@fonts@letter{Q}{#1}{#2}
+    \texor@fonts@letter{E}{#1}{#2} \texor@fonts@letter{R}{#1}{#2}
+    \texor@fonts@letter{F}{#1}{#2} \texor@fonts@letter{S}{#1}{#2}
+    \texor@fonts@letter{G}{#1}{#2} \texor@fonts@letter{T}{#1}{#2}
+    \texor@fonts@letter{H}{#1}{#2} \texor@fonts@letter{U}{#1}{#2}
+    \texor@fonts@letter{I}{#1}{#2} \texor@fonts@letter{V}{#1}{#2}
+    \texor@fonts@letter{J}{#1}{#2} \texor@fonts@letter{W}{#1}{#2}
+    \texor@fonts@letter{K}{#1}{#2} \texor@fonts@letter{X}{#1}{#2}
+    \texor@fonts@letter{L}{#1}{#2} \texor@fonts@letter{Y}{#1}{#2}
+    \texor@fonts@letter{M}{#1}{#2} \texor@fonts@letter{Z}{#1}{#2}
 }
 
 %% Shorthands %%
 \newcommand{\vl}{\vect{\ell}}
 \newcommand{\vii}{\bm{\textnormal{\bfseries\i}}}
 \newcommand{\vjj}{\bm{\textnormal{\bfseries\j}}}
-\newcommand{\hi}{\hat{\vii}}
-\newcommand{\hj}{\hat{\vjj}}
+\newcommand{\hi}{\hat{\ii}}
+\newcommand{\hj}{\hat{\jj}}
 \newcommand{\Hi}{\hat{\vii}}
 \newcommand{\Hj}{\hat{\vjj}}
 \newcommand{\fii}{\fld{i}}
@@ -313,14 +395,14 @@ $\bbold{#1}$%
 \newcommand{\vfour}{\vect{4}}
 \newcommand{\vfive}{\vect{5}}
 
-\mkalph@{v}{vect} % vectors
-\mkalph@{h}{hat} % hactors
-\mkalph@{H}{hatt} % hactors
-\mkalph@{iv}{ivect} % italic vectors
-\mkalph@{iH}{ihatt} % italic hactors
-\mkalph@{L}{lie}  % fracktur (lie)
-\mkalph@{C}{cat}  % calligraphy
-\mkalph@{f}{fld}  % black board
+\texor@fonts@alphabet{v}{vect}   % vectors
+\texor@fonts@alphabet{h}{hat}    % vectors with hats!
+\texor@fonts@alphabet{H}{hatt}   % bold vectors with hats!
+\texor@fonts@alphabet{iv}{ivect} % italic vectors
+\texor@fonts@alphabet{iH}{ihatt} % italic vectors with hats!
+\texor@fonts@alphabet{L}{lie}    % fracktur (lie)
+\texor@fonts@alphabet{C}{cat}    % calligraphy
+\texor@fonts@alphabet{f}{fld}    % black board
  
 % Greek %
 \newcommand{\al}{\alpha}
@@ -367,7 +449,7 @@ $\bbold{#1}$%
     {\hstretch{0.8}{\varDelta}}
     {\hstretch{0.7}{\varDelta}}
     {\hstretch{0.7}{\varDelta}}}}
-\newcommand{\vlla}{\varLambda}
+\newcommand{\vLa}{\varLambda}
 \newcommand{\vTe}{\varTheta}
 \newcommand{\vSi}{\varSigma}
 \newcommand{\vOm}{\varOmega}
@@ -395,151 +477,176 @@ $\bbold{#1}$%
 \let\pilcrow\P
 
 % Number Systems %
-\newcommand{\F}{\fF} % finite field
-\newcommand{\N}{\fN} % natural numbers
-\newcommand{\Z}{\fZ} % integers
-\newcommand{\Q}{\fQ} % rational numbers
-\newcommand{\R}{\fR} % real numbers
-\newcommand{\C}{\fC} % complex numbers
+\newcommand{\F}{\fF}   % finite field
+\newcommand{\N}{\fN}   % natural numbers
+\newcommand{\Z}{\fZ}   % integers
+\newcommand{\Q}{\fQ}   % rational numbers
+\newcommand{\R}{\fR}   % real numbers
+\newcommand{\C}{\fC}   % complex numbers
 \renewcommand{\P}{\fP} % PROJECTIVE SPACE!!!
+\newcommand{\RP}{\R\P}
 
-\newcommand{\newspgrp}[2]{
-    \expandafter\DeclareDocumentCommand\csname#1\endcsname{ O{} m }{\mathrm{#2}_{##1}\@exists{##2}{\Par{##2}}{}}
+\newcommand{\newlineargroup}[2]{
+    \DeclareDocumentCommand{#1}{ O{} O{} }{\mathrm{#2}_{##1}\texor@exists{##2}{\Par{##2}}{}}
 }
 
-\newspgrp{GL}{GL}
-\newspgrp{SL}{SL}
-\newspgrp{SO}{SO}
-\newspgrp{sO}{O}
-\newspgrp{SU}{SU}
-\newspgrp{sU}{U}
+\newlineargroup{\GL}{GL}
+\newlineargroup{\SL}{SL}
+\newlineargroup{\SO}{SO}
+\newlineargroup{\sO}{O}
+\newlineargroup{\SU}{SU}
+\newlineargroup{\sU}{U}
+\newlineargroup{\Mat}{M}
+
+\newlineargroup{\lGL}{\lie{gl}}
+\newlineargroup{\lSL}{\lie{sl}}
+\newlineargroup{\lSO}{\lie{so}}
+\newlineargroup{\lsO}{\lie{o}}
+\newlineargroup{\lSU}{\lie{su}}
+\newlineargroup{\lsU}{\lie{u}}
+\newlineargroup{\lMat}{\lie{m}}
 
 % Categories %
 
-\newcommand{\newcat}[2][c]{
+\newcommand{\newcategory}[2][c]{
     \expandafter\newcommand\csname #1#2\endcsname{
         {\namedCat{#2}}
     }
 }
-\newcommand{\newlcat}[2][cl]{
+\newcommand{\newleftcategory}[2][cl]{
     \expandafter\newcommand\csname #1#2\endcsname[1][]{
-        {\@exists{##1}{##1\text{-}}{}\namedCat{#2}}
+        {\texor@exists{##1}{##1\text{-}}{}\namedCat{#2}}
     }
 }
-\newcommand{\newrcat}[2][cr]{
+\newcommand{\newrightcategory}[2][cr]{
     \expandafter\newcommand\csname #1#2\endcsname[1][]{
-        {\namedCat{#2}\@exists{##1}{\text{-}##1}{}}
+        {\namedCat{#2}\texor@exists{##1}{\text{-}##1}{}}
     }
 }
-\newcommand{\newlrcat}[2][clr]{
+\newcommand{\newleftrightcategory}[2][clr]{
     \expandafter\DeclareDocumentCommand\csname #1#2\endcsname{ O{} O{} }{
-        {\@exists{##1}{##1\text{-}}{}\namedCat{#2}\@exists{##2}{\text{-}##2}{}}
+        {\texor@exists{##1}{##1\text{-}}{}\namedCat{#2}\texor@exists{##2}{\text{-}##2}{}}
     }
 }
-\newcommand{\newvcat}[2][cv]{
+\newcommand{\newsubcriptcategory}[2][cv]{
     \expandafter\newcommand\csname #1#2\endcsname[1][]{
         {\namedCat{#2}_{##1}}
     }
 }
-\newcommand{\newvlcat}[2][cvl]{
+\newcommand{\newleftsubcriptcategory}[2][cvl]{
     \expandafter\DeclareDocumentCommand\csname #1#2\endcsname{ O{} O{} }{
-        {\@exists{##1}{##1\text{-}}{}\namedCat{#2}_{##2}}
+        {\texor@exists{##1}{##1\text{-}}{}\namedCat{#2}_{##2}}
     }
 }
-\newcommand{\newpcat}[2][cp]{
+\newcommand{\newparentesiscategory}[2][cp]{
     \expandafter\newcommand\csname #1#2\endcsname[1][]{
         {\namedCat{#2}\Par{##1}}
     }
 }
 
 % Cats: Sets
-\newcat{Set}        % sets / functions
-\newcat{Cls}        % classes / functions
-\newcat{Ens}        % ensambles / functions
-\newcat{Fin}        % finite sets / functions
-\newcat{Finord}     % finite ordinals / order-preserving functions
-\newcat{Ord}        % ordered sets / order-preserving maps
-\newcat{Rel}        % relations / relation-preserving maps
+\newcategory{Set}        % sets / functions
+\newcategory{Cls}        % classes / functions
+\newcategory{Ens}        % ensambles / functions
+\newcategory{Fin}        % finite sets / functions
+\newcategory{Finord}     % finite ordinals / order-preserving functions
+\newcategory{Ord}        % ordered sets / order-preserving maps
+\newcategory{Rel}        % relations / relation-preserving maps
 
 % Cats: Grps %
-\newcat{Mon}        % monoids / homomorphisms
-\newcat{Grp}        % groups / homomorphisms
-\newcat{Ab}         % abelian groups / homomorphisms
-\newcat{Rig}        % rigs / homomorphisms
-\newcat{Rng}        % rngs / homomorphisms
-\newcat{Ring}       % rings / homomorphisms
-\newcat{CRng}       % commutative rngs / homomorphisms
-\newcat{CRing}      % commutative rings / homomorphisms
-\newcat{Dom}        % integral domains / homomorphisms
-\newcat{Fld}        % fields / homomorphisms
+\newcategory{Mon}        % monoids / homomorphisms
+\newcategory{Grp}        % groups / homomorphisms
+\newcategory{Ab}         % abelian groups / homomorphisms
+\newcategory{Rig}        % rigs / homomorphisms
+\newcategory{Rng}        % rngs / homomorphisms
+\newcategory{Ring}       % rings / homomorphisms
+\newcategory{CRng}       % commutative rngs / homomorphisms
+\newcategory{CRing}      % commutative rings / homomorphisms
+\newcategory{Dom}        % integral domains / homomorphisms
+\newcategory{Fld}        % fields / homomorphisms
 
-\newlrcat[c]{Mod}   % two-sided modules / linear maps
-\newrcat{Mod}       % right modules / linear maps
-\newlrcat[c]{GMod}  % graded modules / linear maps
-\newlrcat[c]{DGMod} % differential graded modules
-\newvcat[c]{Alg}    % algebras / homomorphisms
-\newvcat[c]{CAlg}   % commutative algebras / homomorphisms
-\newvcat[c]{Rep}    % representations / intertwiners
-\newvlcat[cv]{Rep}  % " / " (w/ subscript)
-\newvcat[c]{Vct}    % vector spaces / linear maps
-\newvcat[c]{Vect}   % " / "
+\newleftrightcategory[c]{Mod}      % two-sided modules / linear maps
+\newrightcategory{Mod}             % right modules / linear maps
+\newsubcriptcategory[c]{Chn}       % chains over a ring
+\newleftrightcategory[c]{GMod}     % graded modules / linear maps
+\newleftrightcategory[c]{DGMod}    % differential graded modules
+\newsubcriptcategory[c]{Alg}       % algebras / homomorphisms
+\newsubcriptcategory[c]{CAlg}      % commutative algebras / homomorphisms
+\newsubcriptcategory[c]{Rep}       % representations / intertwiners
+\newleftsubcriptcategory[cv]{Rep}  % " / " (w/ subscript)
+\newsubcriptcategory[c]{Vct}       % vector spaces / linear maps
+\newsubcriptcategory[c]{Vect}      % " / "
 
 % Cats: Calc %
-\newcat{Met}        % metric spaces / metric-preserving maps
-\newcat{CMet}       % complete metric spaces / metric-preserving functions
-\newcat{Hil}        % Hilbert spaces
-\newcat{Ban}        % Banach spaces
-\newcat{Lie}        % Lie groups/algebras
-\newcat{Man}        % manifolds
-\newcat{DMan}       % differentiable manifolds
-\newcat{SMan}       % smooth manifolds
+\newcategory{Met}        % metric spaces / metric-preserving maps
+\newcategory{CMet}       % complete metric spaces / metric-preserving functions
+\newcategory{Hil}        % Hilbert spaces
+\newcategory{Ban}        % Banach spaces
+\newcategory{Lie}        % Lie groups/algebras
+\newcategory{Man}        % manifolds
+\newcategory{DMan}       % differentiable manifolds
+\newcategory{SMan}       % smooth manifolds
 
 % Cats: Cats %
-\newcat{Grph}       % graphs / morphisms of graphs
-\newcat{Quiv}       % quivers / morphisms of quivers
-\newrcat[c]{Cat}    % categories / functors
-\newcat{AbCat}      % Ab categories / additive functors
-\newcat{CAT}        % large categories / functors
-\newcat{Gpd}        % groupoids / homomorphisms
-\newcat{Moncat}     % monoidal categories / monoidal functors
+\newcategory{Grph}          % graphs / morphisms of graphs
+\newcategory{Quiv}          % quivers / morphisms of quivers
+\newleftcategory[c]{Cat}    % categories / functors
+\newcategory{AbCat}         % Ab categories / additive functors
+\newcategory{CAT}           % large categories / functors
+\newleftcategory[c]{Gpd}    % groupoids / homomorphisms
+\newcategory{Moncat}        % monoidal categories / monoidal functors
+\newcategory{MCat}          % model categories / Quillen adjunctions
+\newcategory{sSet}          % simplicial sets / functions
+\newcategory{sCat}          % simplicial categories
 
-\newcat{Map}        % not actually a category
-\newcat{Mor}        % ...?
-\newcat{Funct}      % functors / natural transformations
-\newcat{End}        % endofunctors / natural transformations
-\newcat{Nat}        % natural transformations
-\newcat{Cone}       % cones
+\newcommand{\cCatad}{\cCat_{\rmn{ad}}} % adjunctions
+
+\newcategory{Map}        % maps of various kinds
+\newcategory{Mor}        % "
+\newcategory{Funct}      % "
+\newcategory{Func}       % "
+\newcategory{Fun}        % "
+\newcategory{End}        % endofunctors / natural transformations
+\newcategory{Nat}        % natural transformations
+\newcategory{Cone}       % cones
 
 % Cats: Tops $
-\newcat{Top}        % topological spaces / continuous maps
-\newcat{Toph}       % topological spaces / maps modulo homotopy
-\newcat{Htpy}       % " / "
-\newpcat[cp]{Open}  % open subsets / inclusions
+\newcategory{Top}        % topological spaces / continuous maps
+\newcategory{Toph}       % topological spaces / maps modulo homotopy
+\newcategory{Htpy}       % " / "
+\newcategory{hTop}       % " / "
+\newcategory{Haus}       % Hausdorff spaces
+\newcategory{CHaus}      % compact Hausdorff spaces
+\newcategory{CGHaus}     % compactly generated Hausdorff
+
+\newparentesiscategory[cp]{Open}  % open subsets / inclusions
 
 % Cats: Misc %
-\newvcat[c]{Matr}   % natural numbers / matrices
-\newcommand{\ecat}{\cancel{\cat{O}}} % empty category
-\newcommand{\cDel}{\hstretch{0.8}{\varDelta}} % simplex category
+\newsubcriptcategory[c]{Matr}   % natural numbers / matrices
+\newcommand{\cDel}{\hstretch{0.8}{\varDelta}} % deprecated
 
+\newcommand{\cDe}{\hstretch{0.8}{\varDelta}} % simplex category
+\newcommand{\CDe}[1][]{\texor@exists{#1}{\mathbf{\cDe}_{\leq #1}}{\mathbf{\cDe}}} % simplex category
+\newcommand{\CDeop}[1][]{\opp{\CDe[#1]}} % simplex category
 
 
 %%% Delimiters %%%
 
-\newcommand{\LeftRight}[5]{{
+\newcommand{\texor@delim@base}[5]{{
     \scalerel[2ex]{#3}{\vphantom{\left#1#4\right.}}
     #4
     \scalerel[2ex]{#5}{\vphantom{\left#2#4\right.}}
 }}
 
-\DeclareDocumentCommand{\newdelim}{ O{} O{} m m m }{%
+\DeclareDocumentCommand{\texor@delim@new}{ O{} O{} m m m }{%
     \expandafter\newcommand\csname #3\endcsname[1]{%
         {\left#4#1##1#2\right#5}
     }
 }
 % \newDelim[linner][rinner][lmodel][rmodel]{name}{ldelim}{rdelim}
-\DeclareDocumentCommand{\newDelim}{ O{} O{} O{(} O{)} m m m }{%
+\DeclareDocumentCommand{\texor@delim@New}{ O{} O{} O{(} O{)} m m m }{%
     \expandafter\newcommand\csname #5\endcsname[1]{%
-        \LeftRight{#3}{#4}{#6}{#1##1#2}{#7}
+        \texor@delim@base{#3}{#4}{#6}{#1##1#2}{#7}
     }
 }
 
@@ -558,8 +665,8 @@ $\bbold{#1}$%
         \spacechoice{-2.5pt}{-2.1pt}{-1.7pt}{-1.7pt}
             \mathchoice{\bigg)}{\big)}{)}{)}}
 
-\newdelim{Par}{\lparens}{\rparens}
-\newDelim{Paar}{\llparens}{\rrparens}
+\texor@delim@new{Par}{\lparens}{\rparens}
+\texor@delim@New{Paar}{\llparens}{\rrparens}
 
 % []
 \providecommand{\lbrack}{[}
@@ -571,19 +678,14 @@ $\bbold{#1}$%
     {\hspace{-0.4pt}\mathchoice{\bigg]}{\big]}{]}{]}
         \spacechoice{-4pt}{-3.1pt}{-1.3pt}{-1.2pt}\mathchoice{\bigg]}{\big]}{]}{]}}
 
-\newdelim%[\spacechoice{2.2pt}{1pt}{0.8pt}{0.5pt}]
-    %[\spacechoice{2.2pt}{1pt}{0.8pt}{0.5pt}]
-    {Squ}{\lbrack}{\rbrack}
-\newDelim{Sqqu}{\llbrack}{\rrbrack}
-
-\newcommand{\LieSeparator}{,}
-\newcommand{\Lie}[2]{\Squ{#1 \LieSeparator #2}}
+\texor@delim@new{Squ}{\lbrack}{\rbrack}
+\texor@delim@New{Sqqu}{\llbrack}{\rrbrack}
 
 % [) (]
-\newdelim[][\spacechoice{1pt}{1pt}{0.8pt}{0.5pt}]{PSqu}{\lparens}{\rbrack}
-\newdelim[\spacechoice{1pt}{1pt}{0.8pt}{0.5pt}][]{SPar}{\lbrack}{\rparens}
-\newDelim{PSqqu}{\llparens}{\rrbrack}
-\newDelim{SPaar}{\llbrack}{\rrparens}
+\texor@delim@new[][\spacechoice{1pt}{1pt}{0.8pt}{0.5pt}]{PSqu}{\lparens}{\rbrack}
+\texor@delim@new[\spacechoice{1pt}{1pt}{0.8pt}{0.5pt}][]{SPar}{\lbrack}{\rparens}
+\texor@delim@New{PSqqu}{\llparens}{\rrbrack}
+\texor@delim@New{SPaar}{\llbrack}{\rrparens}
 
 % {}
 \providecommand{\lbrace}{\{}
@@ -597,21 +699,19 @@ $\bbold{#1}$%
             {\hstretch{1.5}{|}}{\hstretch{1.5}{|}}\spacechoice{-3.2pt}{-3.2pt}{-2.5pt}
                 {-2.5pt}\mathchoice{\}}{\}}{\}}{\}}}
 
-\newdelim[\spacechoice{1pt}{0pt}{0pt}{-0.5pt}]
+\texor@delim@new[\spacechoice{1pt}{0pt}{0pt}{-0.5pt}]
     [\spacechoice{1pt}{0pt}{0pt}{-0.5pt}]{Cur}{\lbrace}{\rbrace}
-\newDelim{Cuur}{\llbrace}{\rrbrace}
+\texor@delim@New{Cuur}{\llbrace}{\rrbrace}
     
 % ||
-\newdelim%[\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}]
-    %[\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}]
-    {Abs}{|}{|}
-\newdelim{Abbs}{\Vert}{\Vert}
-\newcommand{\Nor}[1]{\Abbs{#1}}
+\texor@delim@new{Abs}{|}{|}
+\texor@delim@New{Abbs}{\Vert}{\Vert}
+\def\Nor{\Abbs}
 
 % Ceiling and Floor
-\newdelim[\spacechoice{2.2pt}{0pt}{0pt}{-1pt}][\spacechoice{2.2pt}{0pt}{0pt}{-1pt}]
+\texor@delim@new[\spacechoice{2.2pt}{0pt}{0pt}{-1pt}][\spacechoice{2.2pt}{0pt}{0pt}{-1pt}]
     {Ceil}{\lceil}{\rceil}
-\newdelim[\spacechoice{2.2pt}{0pt}{0pt}{-1pt}][\spacechoice{2.2pt}{0pt}{0pt}{-1pt}]
+\texor@delim@New[\spacechoice{2.2pt}{0pt}{0pt}{-1pt}][\spacechoice{2.2pt}{0pt}{0pt}{-1pt}]
     {Flo}{\lfloor}{\rfloor}
 
 % <>
@@ -619,8 +719,8 @@ $\bbold{#1}$%
 %\newDelim{Ang}
 %    {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}}
 %    {\mathchoice{\bigg\rangle}{\rangle}{\rangle}{\rangle}}
-\newdelim{Ang}{\langle}{\rangle}
-\newDelim{Anng}
+\texor@delim@new{Ang}{\langle}{\rangle}
+\texor@delim@New{Anng}
     {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}
         \spacechoice{-3.95pt}{-2.3pt}{-1.8pt}{-1.8pt}
             \mathchoice{\hstretch{1.5}{\bigg|}}{|}{|}{|}}
@@ -629,24 +729,24 @@ $\bbold{#1}$%
             \mathchoice{\bigg\rangle}{\rangle}{\rangle}{\rangle}}
 
 % f|
-\newdelim{restr}{.}{|}
+\texor@delim@new{restr}{.}{|}
 
 % f/g
 \newcommand{\Quot}[2]{\left.#1\middle/#2\right.}
 
 % <|
-\newdelim{Bra}{\langle}{|}
+\texor@delim@new{Bra}{\langle}{|}
 
-\newDelim[][\spacechoice{1.6pt}{0.8pt}{0.8pt}{-0.5pt}]%
-    {@Bra}%
-    {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}}%
+\texor@delim@New[][\spacechoice{1.6pt}{0.8pt}{0.8pt}{-0.5pt}]
+    {@Bra}
+    {\mathchoice{\bigg\langle}{\langle}{\langle}{\langle}}
     {\mathchoice{\bigg|}{|}{|}{|}}
 
 % |>
-\newdelim{Ket}{|}{\rangle}
+\texor@delim@new{Ket}{|}{\rangle}
 \newcommand{\Keet}[2]{\Ket{#1\,;#2}}
 
-\newDelim[\spacechoice{1.6pt}{0.8pt}{0.8pt}{-0.5pt}][]%
+\texor@delim@New[\spacechoice{1.6pt}{0.8pt}{0.8pt}{-0.5pt}][]%
     {@Ket}%
     {\mathchoice{\bigg|}{|}{|}{|}}%
     {\mathchoice{\bigg\rangle}{\rangle}{\rangle}{\rangle}}
@@ -659,20 +759,14 @@ $\bbold{#1}$%
 
 \newcommand{\BrraKeet}[3]{\left.\Ang{#1\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}\middle|\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}#2\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}\middle|\spacechoice{2.2pt}{1pt}{0.8pt}{-0.5pt}#3}\right.}
 
-%% Derivatives of the above %%
-\newcommand{\angprod}{\Ang{\cdot\,,\cdot}}
-\newcommand{\lieprod}{\Squ{\cdot\,,\cdot}}
-\newcommand{\absprod}{\Abs{\cdot}}
-\newcommand{\norprod}{\Nor{\cdot}}
-
 %%% Operators %%%
 
-\newcommand{\dfrc}[2]{\frac{\displaystyle{#1}}{\displaystyle{#2}}}
+\newcommand{\dispfrac}[2]{\frac{\displaystyle{#1}}{\displaystyle{#2}}}
 
-%% bigops %%
+% Big operators macros %
+
 \newcommand{\newbigop}[2]{%
     \expandafter\DeclareRobustCommand\csname#1\endcsname{%
-        
         \mathop{\vphantom{\sum}\expandafter\mathpalette\csname#1@bigop\endcsname\relax}\slimits@
     }
 
@@ -684,28 +778,42 @@ $\bbold{#1}$%
     }
 }
 
-\let\f@tstar\bigstar
-\def\fatstar{\mathbin{\scalerel*{\f@tstar}{\ThisStyle{}\times}}}
-%\let\@star\bigstar
-%\def\star{\scriptstyle{\@star}}
+\let\texor@sym@bigstar\bigstar
+\def\fatstar{\mathbin{\scalerel*{\texor@sym@bigstar}{\ThisStyle{}\times}}}
 \newbigop{bigstar}{\star}
 \newbigop{bigast}{\ast}
 \newbigop{bigfatstar}{\fatstar}
 
-\newcommand{\smash@display}{%
+\newcommand{\texor@sym@smash@display}{%
 \begin{tikzpicture}[rotate=45,x=0.5ex,y=0.5ex]
 \draw[line width=.095ex, line cap=round] (0,2) -- (3,2) (0,1) -- (3,1) (1,3) -- (1,0) (2,3) -- (2,0);
 \end{tikzpicture}
 }
-\newcommand{\smash@other}{%
+\newcommand{\texor@sym@smash@other}{%
 \begin{tikzpicture}[rotate=45,x=0.5ex,y=0.5ex]
 \draw[line width=.12ex, line cap=round] (0,2) -- (3,2) (0,1) -- (3,1) (1,3) -- (1,0) (2,3) -- (2,0);
 \end{tikzpicture}
 }
 
-\newcommand{\smashtimes}{\mathbin{\smash@other}}
+\newcommand{\texor@sym@conn@display}{%
+\begin{tikzpicture}[x=0.7ex,y=0.7ex]
+\draw[line width=.095ex, line cap=round] (0.5,2) -- (2.5,2) (0.5,1) -- (2.5,1) (1,3) -- (1,0) (2,3) -- (2,0);
+\end{tikzpicture}
+}
 
-\newbigop{bigsmash}{\mathchoice{\smash@display}{\smash@other}{\smash@other}{\smash@other}}
+\newcommand{\texor@sym@conn@other}{%
+\begin{tikzpicture}[x=0.5ex,y=0.5ex]
+\draw[line width=.11ex, line cap=round] (0.5,2) -- (2.5,2) (0.5,1) -- (2.5,1) (1,3) -- (1,0) (2,3) -- (2,0);
+\end{tikzpicture}
+}
+
+\newcommand{\smashtimes}{\mathbin{\texor@sym@smash@other}}
+
+\newcommand{\connplus}{\mathbin{\texor@sym@conn@other}}
+
+\newbigop{bigsmash}{\mathchoice{\texor@sym@smash@display}{\texor@sym@smash@other}{\texor@sym@smash@other}{\texor@sym@smash@other}}
+
+\newbigop{bigconn}{\mathchoice{\texor@sym@conn@display}{\texor@sym@conn@other}{\texor@sym@conn@other}{\texor@sym@conn@other}}
 
 \newcommand{\hash}{\mathbin{\#}}
 \newbigop{bighash}{\#}
@@ -715,92 +823,296 @@ $\bbold{#1}$%
 
 \newbigop{bigdiv}{\div}
 
-%\let\prod@old\prod
-%\newbigop{prod}{\mathchoice{\textstyle{\prod@old}}{\prod@old}{\prod@old}{\prod@old}}
-
-%\let\coprod@old\coprod
-%\newbigop{coprod}{\mathchoice{\textstyle{\coprod@old}}{\coprod@old}{\coprod@old}
-%{\coprod@old}}
-
-\newcommand{\plus@display}{%
+\newcommand{\texor@sym@plus@display}{%
 \begin{tikzpicture}%[rotate=45,x=0.5ex,y=0.5ex]
 \draw[line width=.4ex, line cap=round] (0,0) -- (1,0) (0.5,-0.5) -- (0.5,0.5);
 \end{tikzpicture}
 }
-\newcommand{\plus@other}{%
+\newcommand{\texor@sym@plus@other}{%
 \begin{tikzpicture}%[rotate=45,x=0.5ex,y=0.5ex]
 \draw[line width=0.6ex, line cap=round] (0,0) -- (1,0) (0.5,-0.5) -- (0.5,0.5);
 \end{tikzpicture}
 }
 
-\newcommand{\times@display}{%
+\newcommand{\texor@sym@times@display}{%
 \begin{tikzpicture}[rotate=45,x=0.5ex,y=0.5ex]
 \draw[line width=.065ex, line cap=round] (0,1.5) -- (3,1.5) (1.5,3) -- (1.5,0);
 \end{tikzpicture}
 }
-\newcommand{\times@other}{%
+\newcommand{\texor@sym@times@other}{%
 \begin{tikzpicture}[rotate=45,x=0.5ex,y=0.5ex]
 \draw[line width=.12ex, line cap=round] (0,1.5) -- (3,1.5) (1.5,3) -- (1.5,0);
 \end{tikzpicture}
 }
 
-\newbigop{bigplus}{\mathchoice{\plus@display}{\plus@other}{\plus@other}{\plus@other}}
-%\newbigop{bigtimes}{\mathchoice{\times@display}{\times@other}{\times@other}{\times@other}}
+\newbigop{bigplus}{\mathchoice{\texor@sym@plus@display}{\texor@sym@plus@other}{\texor@sym@plus@other}{\texor@sym@plus@other}}
 
-\DeclareMathOperator{\arccsc}{arccsc}
-\DeclareMathOperator{\arcsec}{arcsec}
-\DeclareMathOperator{\arccot}{arccot}
+%% Operators %%
+
+%% witchcraft for extracting operator names %%
+\begingroup\lccode`\|=`\\
+\lowercase{\endgroup\def\removebs#1{\if#1|\else#1\fi}}
+\newcommand{\texor@macro@name}[1]{\expandafter\removebs\string#1}
+
+\newcommand{\texor@oper@internal@new}[2]{
+    \expandafter\newcommand\csname texor@oper@internal@\texor@macro@name{#1}\endcsname{#2}
+}
+
+\newcommand{\texor@oper@internal@renew}[2]{
+    \expandafter\renewcommand\csname texor@oper@internal@\texor@macro@name{#1}\endcsname{#2}
+}
+
+\newcommand{\texor@oper@internal}[1]{
+    \csname texor@oper@internal@\texor@macro@name{#1}\endcsname
+}
+
+\newcommand{\texor@oper@undefifnointernal}[1]{
+    \texor@exists{\texor@oper@internal{#1}}{}{\undef#1}
+}
+
+\newcommand{\texor@oper@new@small}[2]{
+    \providecommand{#1}{1}
+    \texor@oper@internal@new{#1}{#2}
+    \renewcommand{#1}[1][]{\texor@exists{##1}
+        {\operatorname{\mathrm{\texor@oper@internal{#1}}}\!\Par{##1}}
+        {\operatorname{\mathrm{\texor@oper@internal{#1}}}}
+    }
+}
+
+\newcommand{\texor@oper@new@big}[2]{
+    \providecommand{#1}{1}
+    \texor@oper@internal@new{#1}{#2}
+    \renewcommand{#1}[1][]{\texor@exists{##1}
+        {\mathop{\mathrm{\texor@oper@internal{#1}}}\!\Par{##1}}
+        {\mathop{\mathrm{\texor@oper@internal{#1}}}
+    }}
+}
+
+\newcommand{\newmathop}{\@ifstar\texor@oper@new@big\texor@oper@new@small}
+
+\newcommand{\texor@oper@new@sub}[3][*]{
+    \providecommand{#2}{1}
+    \texor@oper@internal@new{#2}{#3}
+    \DeclareDocumentCommand{#2}{ O{#1} O{} }{
+        \texor@exists{##2}
+            {\operatorname{\mathrm{\texor@oper@internal{#2}}}_{##1}\!\Par{##2}}
+            {\operatorname{\mathrm{\texor@oper@internal{#2}}}_{##1}} 
+    }
+}
+
+\newcommand{\texor@oper@new@sup}[3][*]{
+    \providecommand{#2}{1}
+    \texor@oper@internal@new{#2}{#3}
+    \DeclareDocumentCommand{#2}{ O{#1} O{} }{
+        \texor@exists{##2}
+            {\operatorname{\mathrm{\texor@oper@internal{#2}}}^{##1}\!\Par{##2}}
+            {\operatorname{\mathrm{\texor@oper@internal{#2}}}^{##1}} 
+    }
+}
+
+\newcommand{\newmathzop}{\@ifstar\texor@oper@new@sup\texor@oper@new@sub}
+
+\newcommand{\newprefix}[2]{
+    \providecommand{#1}{1}
+    \texor@oper@internal@new{#1}{#2}
+    \renewcommand{#1}[1][]{
+        \texor@exists{##1}
+            {\mathrm{\texor@oper@internal{#1}}\Par{##1}}
+            {\mathrm{\texor@oper@internal{#1}}}
+    }
+}
+
+\newcommand{\texor@oper@script@sub}[2]{
+    \providecommand{#1}{1}
+    \texor@oper@internal@new{#1}{#2}
+    \renewcommand{#1}[1]{##1^{\mathrm{\texor@oper@internal{#1}}}}
+}
+
+\newcommand{\texor@oper@script@sup}[2]{
+    \providecommand{#1}{1}
+    \texor@oper@internal@new{#1}{#2}
+    \renewcommand{#1}[1]{##1_{\mathrm{\texor@oper@internal{#1}}}}
+}
+
+\newcommand{\newscriptop}{\@ifstar\texor@oper@script@sup\texor@oper@script@sub}
+
+\newcommand{\newsuffixop}[2]{
+    \providecommand{#1}{1}
+    \texor@oper@internal@new{#1}{#2}
+    \renewcommand{#1}[1]{{##1\text{-}\mathrm{\texor@oper@internal{#1}}}}
+}
+
+%% Trig %%
+
+\newmathop{\sin}{sin}
+\newmathop{\cos}{cos}
+\newmathop{\tan}{tan}
+\newmathop{\csc}{csc}
+\newmathop{\sec}{sec}
+\newmathop{\cot}{cot}
+
+\newmathzop*[]{\sinn}{sin}
+\newmathzop*[]{\cosn}{cos}
+\newmathzop*[]{\tann}{tan}
+\newmathzop*[]{\cscn}{csc}
+\newmathzop*[]{\secn}{sec}
+\newmathzop*[]{\cotn}{cot}
+
+\newmathop{\arcsin}{arcsin}
+\newmathop{\arccos}{arccos}
+\newmathop{\arctan}{arctan}
+\newmathop{\arccsc}{arccsc}
+\newmathop{\arcsec}{arcsec}
+\newmathop{\arccot}{arccot}
+
+\newmathop{\sinh}{sinh}
+\newmathop{\cosh}{cosh}
+\newmathop{\tanh}{tanh}
+\newmathop{\csch}{csch}
+\newmathop{\sech}{sech}
+\newmathop{\coth}{coth}
+
+\newmathzop*[]{\sinhn}{sinh}
+\newmathzop*[]{\coshn}{cosh}
+\newmathzop*[]{\tanhn}{tanh}
+\newmathzop*[]{\cschn}{csch}
+\newmathzop*[]{\sechn}{sech}
+\newmathzop*[]{\cothn}{coth}
+
+\newmathop{\arcsinh}{arcsinh}
+\newmathop{\arccosh}{arccosh}
+\newmathop{\arctanh}{arctanh}
+\newmathop{\arccsch}{arccsch}
+\newmathop{\arcsech}{arcsech}
+\newmathop{\arccoth}{arccoth}
+
+\newmathop{\ln}{ln}
+\newmathop{\log}{log}
+\newmathzop[]{\logn}{log}
+\newmathop{\exp}{exp}
+\newcommand{\euler}{\bm{e}}
+\newcommand{\qI}{\cat{i}}
+\newcommand{\qJ}{\cat{j}}
+\newcommand{\qK}{\cat{k}}
+\newcommand{\I}{\qI}%{{\dot{\iota}}}
+\newcommand{\E}[1]{\euler^{#1}}
+\newmathop{\lb}{lb}
 
 \def\optimes{\mathop{\otimes}}
 
 %% Algebra %%
-\DeclareMathOperator{\img}{im}
-\DeclareMathOperator{\coker}{coker}
+\newmathop{\img}{im}
+\newmathop{\rank}{rank}
+\newmathop{\ker}{ker}
+\newmathop{\nullsp}{null}
+\newmathop{\dim}{dim}
+\newmathop{\det}{det}
+\newmathop{\coker}{coker}
 \newcommand{\image}{\img} %% deprecated
-\DeclareMathOperator{\Span}{span}
-\DeclareMathOperator{\sign}{sign}
-\newcommand{\transp}{^{\mathrm{T}}}
-\newcommand{\cotran}{^\dagger}
-\newcommand{\opp}{^{\mathrm{op}}}
-\newcommand{\dual}{^*}
-\newcommand{\comp}{^{\mathrm{c}}}
-\DeclareMathOperator{\tr}{tr}
-\DeclareMathOperator{\Res}{\vphantom{d}Res}
-\DeclareMathOperator{\Ind}{Ind}
-\DeclareMathOperator{\Ann}{Ann}
-\DeclareMathOperator{\Frac}{Frac}
-\DeclareMathOperator{\Char}{char}
+\newmathop{\Span}{span}
+\newmathop{\sign}{sign}
+\newscriptop{\transp}{T}
+\newscriptop{\abel}{ab}
+\newscriptop{\cotran}{\dagger}
+\newscriptop{\opp}{op}
+\newscriptop{\dual}{*}
+\newscriptop{\comp}{c}
+\newmathop{\tr}{tr}
+\newmathop{\Res}{\vphantom{d}Res}
+\newmathop{\Ind}{Ind}
+\newmathop{\Ann}{Ann}
+\newmathop{\Frac}{Frac}
+\newmathop{\Char}{char}
+\newcommand{\Gal}[1][]{\rmn{Gal}\texor@exists{#1}{\Par{#1}}{}}
+\newmathop{\Rad}{Rad}
+
+\newcommand{\Tens}[1][]{{T^{#1}}}
+\newcommand{\Symm}[1][]{{\mathrm{Sym}^{#1}}}
+\newcommand{\Extr}[1][]{{\LLa^{#1}}}
 
 \newcommand{\powset}[1]{\CP\left(#1\right)} 
 
 \renewcommand{\mod}{\mathrel{\rmn{mod}}}
 
-% I'll be honest, I hate \Re and \Im
-\def\Re{\lie{R}}%{\mathscr{R}}
-\def\Im{\lie{I}}%{\mathscr{I}}
+% I'll be honest, I hate default \Re and \Im
+\newmathop{\Re}{\LR}
+\newmathop{\Im}{\LI}
+
+%% Number Theory %%
+\newmathop{\gcd}{gcd}
+\newmathop{\lcd}{lcd}
 
 %% Categories %%
-\DeclareMathOperator{\Hom}{\cat{hom}} % hom-set
-\DeclareMathOperator{\Endo}{End}      % endomorphism
-\DeclareMathOperator{\Aut}{Aut}       % automorphism
-\DeclareMathOperator{\Obj}{\cat{obj}} % category objects
-\DeclareMathOperator{\Mor}{\cat{mor}} % category morphisms
-\DeclareMathOperator{\Dom}{\cat{dom}} % domain
-\DeclareMathOperator{\Cod}{\cat{cod}} % codomain
-\newcommand*\prd{\times}              % product
-\newcommand{\coprd}{\amalg}           % coproduct 
-\newcommand{\Colim}{\varinjlim}       % colimit
-\newcommand{\Lim}{\varprojlim}        % lim
-\newcommand{\Id}{\cat{id}}            % category identity map
+\newmathop{\texor@oper@Hom}{\cat{hom}} % hom-set
+\newmathzop[]{\texor@oper@Homz}{\cat{hom}} % hom-set
+\newcommand{\Hom}{\@ifstar\texor@oper@Homz\texor@oper@Hom}
+\newmathop{\Endo}{End}      % endomorphism
+\newmathop{\Aut}{Aut}       % automorphism
+\newmathop{\Obj}{\cat{obj}} % category objects
+\newmathop{\Mor}{\cat{mor}} % category morphisms
+\newmathop{\Dom}{\cat{dom}} % domain
+\newmathop{\Cod}{\cat{cod}} % codomain
+\newmathop{\sk}{sk}         % skeleton
+\newmathop{\cosk}{cosk}     % coskeleton
+\newcommand*\prd{\times}    % product
+\newcommand{\coprd}{\amalg} % coproduct
+\newcommand{\cotimes}{\amalg}
+\newmathop*{\Lim}{lim}      % lim
+\newmathop*{\Colim}{colim}  % colim
+\newcommand{\Id}{\cat{id}}  % category identity map
+\newmathop{\Elmt}{Elmt}     % element category
+\newprefix{\Nrv}{N}         % nerve
+\newprefix{\hcat}{h}        % homotopy category
+\newprefix{\hCat}{\vh}        % homotopy 2-category
+\newmathop{\Map}{Map}
+\newmathop{\Fib}{Fib}
+\newmathop{\Cofib}{Cofib}
+\newscriptop*{\fobj}{f}
+\newscriptop*{\cobj}{c}
+\newscriptop*{\cfobj}{cf}
+\newmathop{\cCh}{\namedCat{Ch}}
+\newmathop{\ev}{ev}
 
-\DeclareMathOperator{\Rad}{\cat{rad}} 
+\newcommand{\rsim}{\mathbin{\overset{\rmn{R}}{\sim}}}
+\newcommand{\lsim}{\mathbin{\overset{\rmn{L}}{\sim}}}
+
+\newsuffixop{\sinj}{inj}
+\newsuffixop{\sproj}{proj}
+\newsuffixop{\scof}{cof}
+\newsuffixop{\sfib}{fib}
+
+\newsuffixop{\scell}{cell}
   
 %% Topology %%
-\DeclareMathOperator{\Int}{Int} % interior
-\DeclareMathOperator{\Ext}{Ext} % exteriror
-\DeclareMathOperator{\Bd}{Bd}   % boundary
+\newmathop{\Int}{Int} % interior
+\newmathop{\Ext}{Ext} % exteriror
+\newmathop{\Bd}{Bd}   % boundary
 \newcommand{\qsim}{{/{\sim}}}
 \newcommand{\op}[1]{#1^\circ}
+\newcommand{\piN}[1]{\operatorname{\pi_{#1}}}
+\newmathop{\Sing}{Sing}
+
+\newmathzop{\hmS}{\mathnormal{S}}
+\newmathzop{\hmZ}{\mathnormal{Z}}
+\newmathzop{\hmB}{\mathnormal{B}}
+\newmathzop{\hmH}{\mathnormal{H}}
+
+\newmathzop{\hmrS}{\tl{\mathnormal{S}}}
+\newmathzop{\hmrZ}{\tl{\mathnormal{Z}}}
+\newmathzop{\hmrB}{\tl{\mathnormal{B}}}
+\newmathzop{\hmrH}{\tl{\mathnormal{H}}}
+
+% POIncare group
+\newmathzop[1]{\poi}{\pi} 
+\newmathzop[1]{\Poi}{\Pi}
+
+\newmathzop*{\chS}{\mathnormal{S}}
+\newmathzop*{\chZ}{\mathnormal{Z}}
+\newmathzop*{\chB}{\mathnormal{B}}
+\newmathzop*{\chH}{\mathnormal{H}}
+
+\newmathzop[]{\Sin}{Sin}
+\newmathzop*[]{\coSin}{Sin}
  
 %% Analysis %% 
  
@@ -808,17 +1120,30 @@ $\bbold{#1}$%
 \newcommand{\diff}{\mathrm{\mathstrut d}}
  
 % low-level tex for dx, via ISO-31 %
-\makeatletter
 \providecommand*{\rawdiff}{\@ifnextchar^{\DIfF}{\DIfF^{}}}
 \def\DIfF^#1{\mathop{\diff}\nolimits^{#1}\gobblespace}
 \def\gobblespace{\futurelet\diffarg\opspace}
-\def\opspace{\let\DiffSpace\!\ifx\diffarg(\let\DiffSpace\relax\else\ifx\diffarg[\let\DiffSpace\relax\else\ifx\diffarg\{\let\DiffSpace\relax\fi\fi\fi\DiffSpace}
+\def\opspace{
+    \let\DiffSpace\!
+    \ifx\diffarg(
+        \let\DiffSpace\relax
+    \else
+        \ifx\diffarg[
+            \let\DiffSpace\relax
+        \else
+            \ifx\diffarg\{
+                \let\DiffSpace\relax
+            \fi
+        \fi
+    \fi
+    \DiffSpace
+}
 % %
  
 \newcommand{\D}{\rawdiff}
 \newcommand{\DD}{\mathrm{D}}
 \newcommand{\del}{\partial}
-%\newcommand{\nab}{\vnabla}
+
 % \leib[2]{d}{f}{x} -> (d^2 f)/dx^2
 \providecommand*{\leib}[4][]{\frac{#2^{#1}#3}{#2 #4^{#1}}}
 
@@ -826,43 +1151,63 @@ $\bbold{#1}$%
 \newcommand{\Dd}[3][]{\leib[#1]{\DD}{#2}{#3}}
 \newcommand{\pd}[3][]{\leib[#1]{\del}{#2}{#3}}
 
+\newcommand{\Dx}{{\D x}}
+\newcommand{\Dy}{{\D y}}
+\newcommand{\Dt}{{\D t}}
+
 \newcommand{\cnt}{\CC} % function ranks, e.g. \cnt^0 -> continuous functions
 \newcommand{\rie}{\LR} % riemann integrable funcs
 \newcommand{\lbe}{\CL} % lebesgue integrable funcs
+
+\newcommand{\Nd}[2]{#2^{\Par{#1}}}
+\newmathzop{\res}{res}
 
 \let\@iint\varoiint
 \let\varoiint\oiint
 \let\oiint\@iint
  
 %% Vect Calc %%
-\DeclareMathOperator{\grad}{grad}
-\DeclareMathOperator{\dive}{div}
-\DeclareMathOperator{\curl}{curl}
+\newmathop{\grad}{grad}
+\newmathop{\dive}{div}
+\newmathop{\curl}{curl}
 
-\newcommand{\Grad}{\vnabla}
-\newcommand{\Dive}{\vnabla\cdot}
-\newcommand{\Curl}{\vnabla\times}
-\newcommand{\laplace}{\vnabla^2}
+\newmathop{\Grad}{\vnabla}
+\newmathop{\Dive}{\vnabla\cdot}
+\newmathop{\Curl}{\vnabla\times}
+\newmathop{\laplace}{\vnabla^2}
 
 %% Wordz %%
-\newcommand{\AND}{\,\mathrm{and}\,}
-\newcommand{\OR}{\,\mathrm{or}\,}
-\newcommand{\XOR}{\,\mathrm{xor}\,}
-\newcommand{\IF}{\,\mathrm{if}\,}
-\newcommand{\IFF}{\,\mathrm{iff}\,}
-\newcommand{\ST}{\,\mathrm{such\,that}\,}
-\newcommand{\OTHER}{\,\mathrm{otherwise}\,}
-\newcommand{\ELSE}{\,\mathrm{else}\,}
-\newcommand{\IN}{\,\mathrm{in}\,}
-\newcommand{\FOR}{\,\mathrm{for}\,} 
+\newcommand{\newword}{\@ifstar\@newwordstar\@newword}
+
+\newcommand{\@newwordstar}[2]{\newcommand{#1}{\quad\mathrel{\mathrm{#2}}\quad}}
+\newcommand{\@newword}[2]{\newcommand{#1}{\mathrel{\mathrm{#2}}}}
+
+\newword{\AND}{and}
+\newword{\OR}{or}
+\newword{\XOR}{xor}
+\newword{\IF}{if}
+\newword{\IFF}{iff}
+\newword{\ST}{s.t.}
+\newword{\OTHER}{otherwise}
+\newword{\UNLESS}{unless}
+\newword{\ELSE}{else}
+\newword{\IN}{in}
+\newword{\FOR}{for}
+
+\newword*{\qAND}{and}
+\newword*{\qOR}{or}
 
 %% Misc %%
 \renewcommand{\to}{\rightarrow}
 \newcommand{\To}{\Rightarrow}
+\newcommand{\Tto}{\Rrightarrow}
 \newcommand{\toto}{\rightrightarrows}
 \newcommand{\from}{\leftarrow}
+\newcommand{\From}{\Leftarrow}
+\newcommand{\Ffrom}{\Lleftarrow}
 \newcommand{\fromfrom}{\leftleftarrows}
-\newcommand{\fromto}{\leftrightarrow}
+\newcommand{\fromto}{\texor@delim@basearrow}
+\newcommand{\FromTo}{\texor@delim@basearrow}
 \newcommand{\up}{\uparrow}
 \newcommand{\upup}{\upuparrows}
 \newcommand{\down}{\downarrow}
@@ -877,31 +1222,45 @@ $\bbold{#1}$%
 
 \newcommand{\FirstWay}{\noindent($\Rightarrow$). }
 \newcommand{\OtherWay}{\noindent($\Leftarrow$). }
+\newcommand{\NWay}[2]{\noindent(#1) $\Leftarrow$ (#2). }
 
 \newcommand{\nto}{\not\to}
-\DeclareMathOperator{\ide}{id}
+\newcommand{\@ide}{\mathrm{id}}
+\newcommand{\ide}[1][]{\texor@exists{#1}{\@ide_{#1}}{\@ide}}
 
 \newcommand{\rmap}[1]{\xrightarrow{#1}}
 \newcommand{\lmap}[1]{\xleftarrow{#1}}
 
-\DeclareMathOperator{\lcd}{lcd} 
-\DeclareMathOperator{\sech}{sech}
-\DeclareMathOperator{\csch}{csch}
-\DeclareMathOperator{\erf}{erf}
-%\renewcommand{\mod}[1]{\left(\mathrm{mod}\,#1\right)}
+\newmathop{\erf}{erf}
 
 \newcommand{\nin}{\notin}
 \newcommand{\subS}{\sbs}
 \newcommand{\supS}{\sps}
 \newcommand{\sbs}{\subset}
 \newcommand{\sps}{\supset}
-\newcommand{\sans}[1][]{\setminus\@exists{#1}{\Cur{#1}}{}}
+\newcommand{\nsubS}{\nsbs}
+\newcommand{\nsupS}{\nsps}
+\newcommand{\nsbs}{\subsetneq}
+\newcommand{\nsps}{\supsetneq}
+\newcommand{\sans}[1][]{\setminus\texor@exists{#1}{\Cur{#1}}{}}
 \newcommand{\sansz}{\sans[0]}
+
+\newcommand{\@setminus@t}
+    {\hbox{\tikz{\draw[line width=0.6pt,line cap=round] (3pt,0) -- (0,5pt);}}}
+\newcommand{\@setminus@s}
+    {\hbox{\tikz{\draw[line width=0.45pt,line cap=round] (2pt,0) -- (0,4pt);}}}
+\newcommand{\@setminus@ss}
+    {\hbox{\tikz{\draw[line width=0.4pt,line cap=round] (1.5pt,0) -- (0,3pt);}}}
+
+\let\bigsetminus\setminus
+\renewcommand{\setminus}
+    {\mathbin{\mathchoice{\@setminus@t}{\@setminus@t}{\@setminus@s}{\@setminus@ss}}}
 
 \let\@cong\cong
 \newcommand{\ind}{\fld{1}}
-\newcommand{\isom}{\simeq}
+\newcommand{\isom}{\@cong}
 \newcommand{\homeo}{\@cong}
+\newcommand{\htpy}{\simeq}
 \renewcommand{\cong}{\equiv}
 \newcommand{\isdef}{:=}
 
@@ -916,8 +1275,8 @@ $\bbold{#1}$%
 \newcommand{\KE}{K\hspace{-0.6ex}E}
 \newcommand{\rA}{\text{\normalfont\AA}}
 
-\def\labar{\protect\@lambdabar}
-\def\@lambdabar{%
+\def\labar{\protect\texor@font@lambdabar}
+\def\texor@font@lambdabar{%
 \relax
 \bgroup
 \def\@tempa{\hbox{\raise.8\ht0
@@ -941,32 +1300,32 @@ height.25pt depth.1pt\hss}\box0}}%
 %%% Pset templating %%%
 %% TODO: make this a class
 
-\newcommand{\psetSubject}[1]{\def\pset@subject{#1}}
-\def\pset@subject{undefined}
+\newcommand{\psetSubject}[1]{\def\texor@pset@subject{#1}}
+\def\texor@pset@subject{undefined}
 
-\newcommand{\psetAuthor}[1]{\def\pset@author{#1}}
-\def\pset@author{Miguel Young}
+\newcommand{\psetAuthor}[1]{\def\texor@pset@author{#1}}
+\def\texor@pset@author{Miguel Young}
 
-\newcommand{\psetNum}[1]{\def\pset@num{#1}}
-\def\pset@num{undefined}
+\newcommand{\psetNum}[1]{\def\texor@pset@num{#1}}
+\def\texor@pset@num{undefined}
 
-\newcommand{\psetCollabs}[1]{\def\pset@collabs{#1}}
-\def\pset@collabs{}
+\newcommand{\psetCollabs}[1]{\def\texor@pset@collabs{Collaborators: #1}}
+\def\texor@pset@collabs{}
 
-\newcommand{\psetSources}[1]{\def\pset@sources{#1}}
-\def\pset@sources{}
+\newcommand{\psetSources}[1]{\def\texor@pset@sources{Sources: #1}}
+\def\texor@pset@sources{}
 
 \newcommand{\psetTitle}[1]{%
     \newpage
     \begin{center}
         \makeatletter
-        {\huge \pset@subject{} Pset \pset@num{} #1 }
+        {\huge \texor@pset@subject{} Pset \texor@pset@num{} #1 }
 
-        {\large \pset@author}
+        {\large \texor@pset@author}
 
-        \ifthenelse{\equal{\pset@collabs}{}}{}{Collaborators: \pset@collabs}
+        \ifthenelse{\equal{\texor@pset@collabs}{}}{}{Collaborators: \texor@pset@collabs}
         
-        \ifthenelse{\equal{\pset@sources}{}}{}{Sources: \pset@sources}
+        \ifthenelse{\equal{\texor@pset@sources}{}}{}{Sources: \texor@pset@sources}
         \makeatother
     \end{center}
 }
@@ -974,136 +1333,210 @@ height.25pt depth.1pt\hss}\box0}}%
 \newcommand{\makePsetTitle}{\psetTitle{}}
 \newcommand{\mkPsetTitle}{\makePsetTitle}
 
-\newcounter{pset@ProblemCounter}
-\setcounter{pset@ProblemCounter}{0}
+\newcommand{\makepsettitle}{%
+    \makeatletter%
+    \title{\texor@pset@subject{} Pset \texor@pset@num{}\texor@exists{\texor@pset@sources}{\footnote{\texor@pset@sources}}{}}%
+    \author{\texor@pset@author\texor@exists{\texor@pset@collabs}{\footnote{\texor@pset@collabs}}{}}%
+    \maketitle%
+    \makeatother%
+}
+
+\newcounter{texor@pset@ProblemCounter}
+\setcounter{texor@pset@ProblemCounter}{0}
 \newenvironment{psetProblem}{%
     \makeatletter
-    \stepcounter{pset@ProblemCounter}
-    \psetTitle{Problem \arabic{pset@ProblemCounter}}
+    \stepcounter{texor@pset@ProblemCounter}
+    \psetTitle{Problem \arabic{texor@pset@ProblemCounter}}
     \makeatother
 }{}
 
 %%% Matrices %%%
 %% Square %%
 
-\newcommand{\btwo}[4]{%
+\newcommand{\texor@exists@phantom}[1]{\texor@exists{#1}{#1}{\hphantom{0}}}
+
+\newcommand{\bsing}[1]{
     \begin{bmatrix}
-        #1 & #2 \\ #3 & #4
+        \texor@exists@phantom{#1}
     \end{bmatrix}
 }
 
+\newcommand{\btwo}[4]{%
+    \begin{bmatrix}
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2} \\ 
+        #3 & #4 \\
+    \end{bmatrix}
+}
 
 \newcommand{\bthree}[9]{%
     \begin{bmatrix}
-        #1 & #2 & #3 \\ 
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2} & \texor@exists@phantom{#3} \\ 
         #4 & #5 & #6 \\
-        #7 & #8 & #9 
+        #7 & #8 & #9 \\
     \end{bmatrix}
 }
 
 \newcommand{\Vbtwo}[2]{%
     \begin{bmatrix}
-        #1 \\ #2
+        \texor@exists@phantom{#1} \\ #2 \\
     \end{bmatrix}
 }
 
 \newcommand{\Hbtwo}[2]{%
     \begin{bmatrix}
-        #1 & #2
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2}
     \end{bmatrix}
 }
 
 \newcommand{\Vbthree}[3]{%
     \begin{bmatrix}
-        #1 \\ #2 \\ #3
+        \texor@exists@phantom{#1} \\ #2 \\ #3 \\
     \end{bmatrix}
 }
+
+
 
 \newcommand{\Hbthree}[3]{%
     \begin{bmatrix}
-        #1 & #2 & #3
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2} & \texor@exists@phantom{#3}
     \end{bmatrix}
 }
 
+\newcommand{\bdtwo}[2]{\btwo{#1}{}{}{#2}}
+\newcommand{\bdthree}[3]{\bthree{#1}{}{}{}{#2}{}{}{}{#3}}
+
 %% Round %%
+
+\newcommand{\psing}[1]{
+    \begin{pmatrix}
+        \texor@exists@phantom{#1}
+    \end{pmatrix}
+}
 
 \newcommand{\ptwo}[4]{%
     \begin{pmatrix}
-        #1 & #2 \\ 
-        #3 & #4
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2} \\ 
+        #3 & #4 \\
     \end{pmatrix}
 }
 
 \newcommand{\pthree}[9]{%
     \begin{pmatrix}
-        #1 & #2 & #3 \\ 
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2} & \texor@exists@phantom{#3} \\ 
         #4 & #5 & #6 \\
-        #7 & #8 & #9 
+        #7 & #8 & #9 \\
     \end{pmatrix}
 }
 
 \newcommand{\Vptwo}[2]{%
     \begin{pmatrix}
-        #1 \\ #2
+        \texor@exists@phantom{#1} \\ #2 \\
     \end{pmatrix}
 }
 
 \newcommand{\Hptwo}[2]{%
     \begin{pmatrix}
-        #1 & #2
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2}
     \end{pmatrix}
 }
 \newcommand{\Vpthree}[3]{%
     \begin{pmatrix}
-        #1 \\ #2 \\ #3
+        \texor@exists@phantom{#1} \\ #2 \\ #3 \\
     \end{pmatrix}
 }
 
 \newcommand{\Hpthree}[3]{%
     \begin{pmatrix}
-        #1 & #2 & #3
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2} & \texor@exists@phantom{#3}
     \end{pmatrix}
 }
 
+\newcommand{\pdtwo}[2]{\ptwo{#1}{}{}{#2}}
+\newcommand{\pdthree}[3]{\pthree{#1}{}{}{}{#2}{}{}{}{#3}}
+
 %% Vert %%
+
+\newcommand{\vsing}[1]{
+    \begin{vmatrix}
+        \texor@exists@phantom{#1}
+    \end{vmatrix}
+}
 
 \newcommand{\Vtwo}[4]{%
     \begin{vmatrix}
-        #1 & #2 \\ 
-        #3 & #4
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2} \\ 
+        #3 & #4 \\
     \end{vmatrix}
 }
 
 \newcommand{\Vthree}[9]{%
     \begin{vmatrix}
-        #1 & #2 & #3 \\ 
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2} & \texor@exists@phantom{#3} \\ 
         #4 & #5 & #6 \\
-        #7 & #8 & #9 
+        #7 & #8 & #9 \\
     \end{vmatrix}
 }
 
 \newcommand{\VVtwo}[2]{%
     \begin{vmatrix}
-        #1 \\ #2
+        \texor@exists@phantom{#1} \\ #2 \\
     \end{vmatrix}
 }
 
 \newcommand{\HVtwo}[2]{%
     \begin{vmatrix}
-        #1 & #2
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2}
     \end{vmatrix}
 }
 \newcommand{\VVthree}[3]{%
     \begin{vmatrix}
-        #1 \\ #2 \\ #3
+        \texor@exists@phantom{#1} \\ #2 \\ #3 \\
     \end{vmatrix}
 }
 
 \newcommand{\HVthree}[3]{%
     \begin{vmatrix}
-        #1 & #2 & #3
+        \texor@exists@phantom{#1} & \texor@exists@phantom{#2} & \texor@exists@phantom{#3}
     \end{vmatrix}
 }
+
+\newcommand{\Vdtwo}[2]{\Vtwo{#1}{}{}{#2}}
+\newcommand{\Vdthree}[3]{\Vthree{#1}{}{}{}{#2}{}{}{}{#3}}
+
+%%% Linguistics %%%
+
+%% IPA %%
+\newcommand{\tp}{\textipa}
+
+\newcommand{\snd}[1]{\textipa{[#1]}}
+\newcommand{\phn}[1]{\textipa{/#1/}}
+\newcommand{\grh}[1]{$\langle$#1$\rangle$}
+\newcommand{\tpgrh}[1]{\grh{\textipa{#1}}}
+
+\newcommand{\gn}{\textltailn}
+
+\newcommand{\@has}[4][-]{\texor@exists{#1}{{\texor@exists{#2}{[#3#2]}{#4}}}{\hasbrack{#2}}}
+\newcommand{\withc}[2][-]{\@has[#1]{#2}{$+$}{[ ]}}
+\newcommand{\sansc}[2][-]{\@has[#1]{#2}{$-$}{$\eset$}}
+\newcommand{\phrule}[4]{{#1 $\to$ #2\texor@exists{#3#4}{ / \texor@exists{#3}{#3 }{}\_\texor@exists{#4}{ #4}{}}{}}}
+\newcommand{\hasbrack}[1]{%
+\begingroup%
+\renewcommand{\withc}[2][-]{$+$##2}%
+\renewcommand{\sansc}[2][-]{$-$##2}%
+\renewcommand{\actv}[1]{$\al$ ##1}%
+[#1]%
+\endgroup%
+}
+
+\newcommand{\has}{\@ifstar\sansc\withc}
+\newcommand{\actv}[1]{[$\al$ #1]}
+
+%% Phonology %%
+\newcommand{\plus}{$+$}
+\newcommand{\minus}{$-$}
+\newcommand{\into}{$\to$ }
+\newcommand{\blank}{$\underline{\quad}$ }
+\newcommand{\zero}{$\varnothing$ }
 
 %%% OPTIONS %%%
 \newcommand{\checkfor}[2]{%
