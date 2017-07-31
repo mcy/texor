@@ -16,6 +16,8 @@
 \providecommand{\texor@hook@postfontalias}{}
 \providecommand{\texor@hook@postoperators}{}
 
+\let\oldDelta\Delta
+
 %%% OPTIONS %%%
 \DeclareOption{vakil}{
     \let\texor@vakiltemp@hook@prefont=\texor@hook@prefont
@@ -1128,6 +1130,7 @@
 \TexorMathOp{\FR}{\CR}
 \TexorMathOp{\Ko}{\CK}
 \TexorMathOp{\HS}{HS}
+\TexorMathOp{\Shw}{\CS}
 
 
 \TexorTwoScriptOp{\Res}{Res}   % restricted representation
@@ -1343,7 +1346,7 @@
 \TexorTwoScriptOp*{\cDe}{\texor@oper@standard@simplex}
 \TexorTwoScriptOp*{\cHorn}{\vLa}
 
-\TexorCategory[][\CDe]{\texor@oper@standard@simplex}
+\TexorCategory[][\CDe]{\hstretch{-1.2}{\mathbbl{\oldDelta}}}
 \DeclareDocumentCommand{\CDeop}{ O{} }{\opp{\CDe[#1]}}
 
 % model category stuff
@@ -1453,7 +1456,7 @@
 \let\oiint\@iint
 
 \TexorOneScriptOp*{\lsp}{\ell} % l-space of sequences
-\TexorOneScriptOp*{\Lsp}{L\!}  % L-space of functions
+\TexorOneScriptOp*[math-roman]{\Lsp}{L\!}  % L-space of functions
 \TexorOneScriptOp*{\Lbg}{\CL}  % Lebesgue integrable funcs
 \TexorOneScriptOp*{\Cnt}{\CC}  % continuous funcs
 \TexorMathOp{\Csp}{\CC_{\texor@fonts@call{text-roman}{c}}} % cont w/ compact support
@@ -1624,7 +1627,7 @@
 \newcommand{\inj}{\hookrightarrow}
 \newcommand{\srj}{\rightarrow\!\!\!\!\!\!\!\rightarrow}
 
-\renewcommand{\wto}{\rightharpoonup}
+\newcommand{\wto}{\rightharpoonup}
 
 \newcommand{\acts}{\curvearrowright}
 \newcommand{\acted}{\curvearrowleft}
