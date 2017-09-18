@@ -219,7 +219,10 @@
 %% a switch statement
 \newcommand{\texor@switch@ifequals}[3]{\ifthenelse{\equal{#1}{#2}}{#3}{}}
 \newcommand{\switch}[2]{%
-\newcommand{\case}[2]{\texor@switch@ifequals{#1}{##1}{##2}}#2\undef\case}
+\newcommand{\case}[2]{\texor@switch@ifequals{#1}{##1}{##2}}%
+#2%
+\undef\case%
+}
 
 %%% Preamble %%%
 \newcommand{\texor@call}[1]{\csname#1\endcsname}
